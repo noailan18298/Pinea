@@ -787,7 +787,7 @@ export default function App() {
             {t.nav.map(({ label, id }) => (
               <button key={id} onClick={() => scrollTo(id)}
                 className="text-muted-foreground hover:text-foreground text-xs tracking-wide transition-colors"
-                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 500 }}>
+                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 500, fontSize: "16px"  }}>
                 {label}
               </button>
             ))}
