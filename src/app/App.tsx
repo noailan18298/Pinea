@@ -526,7 +526,7 @@ export default function App() {
                   <div className="border-t border-border px-6 py-3 flex items-center justify-between bg-background">
                     <span
                       className="text-muted-foreground text-xs tracking-wide"
-                      style={{ fontFamily: "'Liebling', 'DM Sans', sans-serif", fontWeight: 500 }}
+                      style={{ fontFamily: "'Liebling', 'DM Sans', sans-serif", fontWeight: 700 }}
                     >
                       {t.catLearnMore}
                     </span>
@@ -695,7 +695,7 @@ export default function App() {
                     <div className="mt-0.5 text-primary">{icon}</div>
                     <div>
                       <div className="text-muted-foreground text-xs tracking-wide uppercase mb-0.5"
-                        style={{ fontFamily: "'Liebling', 'DM Sans', sans-serif", fontWeight: 500 }}>{label}</div>
+                        style={{ fontFamily: "'Liebling', 'DM Sans', sans-serif", fontWeight: 700 }}>{label}</div>
                       <div className="text-foreground font-light text-sm">{value}</div>
                     </div>
                   </div>
@@ -710,7 +710,7 @@ export default function App() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
                   <label className="block text-xs tracking-wide uppercase text-muted-foreground mb-2"
-                    style={{ fontFamily: "'Liebling', 'DM Sans', sans-serif", fontWeight: 500 }}>
+                    style={{ fontFamily: "'Liebling', 'DM Sans', sans-serif", fontWeight: 700 }}>
                     {t.formName}
                   </label>
                   <input type="text" required placeholder={t.formNamePh}
@@ -718,7 +718,7 @@ export default function App() {
                 </div>
                 <div>
                   <label className="block text-xs tracking-wide uppercase text-muted-foreground mb-2"
-                    style={{ fontFamily: "'Liebling', 'DM Sans', sans-serif", fontWeight: 500 }}>
+                    style={{ fontFamily: "'Liebling', 'DM Sans', sans-serif", fontWeight: 700 }}>
                     {t.formContact}
                   </label>
                   <input type="text" required placeholder={t.formContactPh}
@@ -728,7 +728,7 @@ export default function App() {
 
               <div>
                 <label className="block text-xs tracking-wide uppercase text-muted-foreground mb-2"
-                  style={{ fontFamily: "'Liebling', 'DM Sans', sans-serif", fontWeight: 500 }}>
+                  style={{ fontFamily: "'Liebling', 'DM Sans', sans-serif", fontWeight: 700 }}>
                   {t.formType}
                 </label>
                 <div className="relative">
@@ -743,7 +743,7 @@ export default function App() {
 
               <div>
                 <label className="block text-xs tracking-wide uppercase text-muted-foreground mb-2"
-                  style={{ fontFamily: "'Liebling', 'DM Sans', sans-serif", fontWeight: 500 }}>
+                  style={{ fontFamily: "'Liebling', 'DM Sans', sans-serif", fontWeight: 700 }}>
                   {t.formDesc}
                 </label>
                 <textarea required rows={5} placeholder={t.formDescPh}
@@ -752,7 +752,7 @@ export default function App() {
 
               <div>
                 <label className="block text-xs tracking-wide uppercase text-muted-foreground mb-2"
-                  style={{ fontFamily: "'Liebling', 'DM Sans', sans-serif", fontWeight: 500 }}>
+                  style={{ fontFamily: "'Liebling', 'DM Sans', sans-serif", fontWeight: 700 }}>
                   {t.formBudget}
                 </label>
                 <div className="relative">
