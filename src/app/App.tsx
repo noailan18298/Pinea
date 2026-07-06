@@ -5,6 +5,39 @@ import pineaLogoHe from "@/imports/Asset_8_4x.png";
 import { fetchContent } from "./api";
 import Admin from "./Admin";
 
+// ── Supabase enquiries endpoint ────────────────────────────────────────────
+
+const SUPABASE_URL = "https://ephyusamtgaatbesskbz.supabase.co";
+const SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwaHl1c2FtdGdhYXRiZXNza2J6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4ODc3MTksImV4cCI6MjA5ODQ2MzcxOX0.Dh5gP8PSxSMwG8lYma_3Td55ZteBi9GTLTC7saZ5xgE";
+const ENQUIRIES_URL = `${SUPABASE_URL}/functions/v1/make-server-47481a97/enquiries`;
+
+async function submitEnquiry(payload: {
+  name: string;
+  contact: string;
+  description: string;
+  pieceType: string;
+  budgetRange: string;
+  lang: "he" | "en";
+}) {
+  const res = await fetch(ENQUIRIES_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      apikey: SUPABASE_ANON_KEY,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body.error ?? `Request failed (${res.status})`);
+  }
+
+  return res.json();
+}
+
 // ── Translations ──────────────────────────────────────────────────────────────
 
 const TRANSLATIONS = {
@@ -65,8 +98,10 @@ const TRANSLATIONS = {
     formBudgetOpts: ["עד ₪5,000", "₪5,000 – ₪10,000", "₪10,000 – ₪20,000", "₪20,000+"],
     formBudgetNote: "שיתוף בטווח עוזר לנו להציע את החומרים הנכונים. זה לא מחייב אותך לכלום.",
     formSubmit: "שלח פנייה",
+    formSubmitting: "שולח...",
     formNote: "אנחנו מגיבים באופן אישי תוך 24 שעות. כל הפניות סודיות.",
     formAlert: "הפנייה שלך נשלחה. נחזור אליך תוך 24 שעות.",
+    formErrorMsg: "משהו השתבש בשליחת הפנייה. נסו שוב, או צרו קשר ישירות בטלפון/אימייל.",
     footerCopy: `© ${new Date().getFullYear()} סטודיו פינאה · עבודות עץ ופלדה מותאמות אישית · תוצרת ישראל`,
     logoAlt: "סטודיו פינאה",
     categories: [
@@ -188,8 +223,10 @@ const TRANSLATIONS = {
     formBudgetOpts: ["Up to ₪5,000", "₪5,000 – ₪10,000", "₪10,000 – ₪20,000", "₪20,000+"],
     formBudgetNote: "Sharing a range helps us propose the right materials. It does not commit you to anything.",
     formSubmit: "Send Enquiry",
+    formSubmitting: "Sending...",
     formNote: "We respond personally within 24 hours. All enquiries are confidential.",
     formAlert: "Your enquiry has been sent. We will be in touch within 24 hours.",
+    formErrorMsg: "Something went wrong sending your enquiry. Please try again, or reach us directly by phone/email.",
     footerCopy: `© ${new Date().getFullYear()} Pinea Studio · Custom Wood & Steel Work · Made in Israel`,
     logoAlt: "Pinea Studio",
     categories: [
@@ -264,6 +301,7 @@ export default function App() {
   const [activeCat, setActiveCat] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const [overrides, setOverrides] = useState<{ he: any; en: any }>({ he: null, en: null });
+  const [formStatus, setFormStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const isAdmin = window.location.search.includes("admin");
 
   const t = { ...TRANSLATIONS[lang], ...(overrides[lang] ?? {}) };
@@ -292,6 +330,29 @@ export default function App() {
         const sel = document.getElementById("category-select") as HTMLSelectElement | null;
         if (sel) sel.value = categoryName;
       }, 600);
+    }
+  };
+
+  const handleQuoteSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const data = new FormData(form);
+
+    setFormStatus("submitting");
+    try {
+      await submitEnquiry({
+        name: String(data.get("name") ?? ""),
+        contact: String(data.get("contact") ?? ""),
+        description: String(data.get("description") ?? ""),
+        pieceType: String(data.get("pieceType") ?? ""),
+        budgetRange: String(data.get("budgetRange") ?? ""),
+        lang,
+      });
+      setFormStatus("success");
+      form.reset();
+    } catch (err) {
+      console.error("Enquiry submission failed:", err);
+      setFormStatus("error");
     }
   };
 
@@ -705,7 +766,7 @@ export default function App() {
 
             <form
               className="lg:col-span-3 space-y-5"
-              onSubmit={(e) => { e.preventDefault(); alert(t.formAlert); }}
+              onSubmit={handleQuoteSubmit}
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
@@ -713,7 +774,7 @@ export default function App() {
                     style={{ fontFamily: "'Liebling', 'DM Sans', sans-serif", fontWeight: 700 }}>
                     {t.formName}
                   </label>
-                  <input type="text" required placeholder={t.formNamePh}
+                  <input type="text" name="name" required placeholder={t.formNamePh}
                     className="w-full bg-secondary border border-border text-foreground placeholder-muted-foreground/50 px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors" />
                 </div>
                 <div>
@@ -721,7 +782,7 @@ export default function App() {
                     style={{ fontFamily: "'Liebling', 'DM Sans', sans-serif", fontWeight: 700 }}>
                     {t.formContact}
                   </label>
-                  <input type="text" required placeholder={t.formContactPh}
+                  <input type="text" name="contact" required placeholder={t.formContactPh}
                     className="w-full bg-secondary border border-border text-foreground placeholder-muted-foreground/50 px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors" />
                 </div>
               </div>
@@ -732,7 +793,7 @@ export default function App() {
                   {t.formType}
                 </label>
                 <div className="relative">
-                  <select id="category-select"
+                  <select id="category-select" name="pieceType"
                     className="w-full bg-secondary border border-border text-foreground px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors appearance-none pr-4 pl-10">
                     <option value="">{t.formTypePh}</option>
                     {t.formTypeOpts.map((o) => <option key={o}>{o}</option>)}
@@ -746,7 +807,7 @@ export default function App() {
                   style={{ fontFamily: "'Liebling', 'DM Sans', sans-serif", fontWeight: 700 }}>
                   {t.formDesc}
                 </label>
-                <textarea required rows={5} placeholder={t.formDescPh}
+                <textarea name="description" required rows={5} placeholder={t.formDescPh}
                   className="w-full bg-secondary border border-border text-foreground placeholder-muted-foreground/50 px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors resize-none" />
               </div>
 
@@ -756,7 +817,7 @@ export default function App() {
                   {t.formBudget}
                 </label>
                 <div className="relative">
-                  <select className="w-full bg-secondary border border-border text-foreground px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors appearance-none pr-4 pl-10">
+                  <select name="budgetRange" className="w-full bg-secondary border border-border text-foreground px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors appearance-none pr-4 pl-10">
                     <option value="">{t.formBudgetPh}</option>
                     {t.formBudgetOpts.map((o) => <option key={o}>{o}</option>)}
                   </select>
@@ -765,12 +826,19 @@ export default function App() {
                 <p className="text-muted-foreground text-xs mt-2 font-light">{t.formBudgetNote}</p>
               </div>
 
-              <button type="submit"
-                className="w-full py-5 bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 flex items-center justify-center gap-3 group"
+              <button type="submit" disabled={formStatus === "submitting"}
+                className="w-full py-5 bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 flex items-center justify-center gap-3 group disabled:opacity-60 disabled:cursor-not-allowed"
                 style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 700, fontSize: "1rem", letterSpacing: "0.08em" }}>
-                {t.formSubmit}
-                <Arr size={16} className={`${arrHover} transition-transform`} />
+                {formStatus === "submitting" ? t.formSubmitting : t.formSubmit}
+                {formStatus !== "submitting" && <Arr size={16} className={`${arrHover} transition-transform`} />}
               </button>
+
+              {formStatus === "success" && (
+                <p className="text-primary text-sm text-center font-light">{t.formAlert}</p>
+              )}
+              {formStatus === "error" && (
+                <p className="text-red-400 text-sm text-center font-light">{t.formErrorMsg}</p>
+              )}
 
               <p className="text-muted-foreground text-xs text-center font-light">{t.formNote}</p>
             </form>
