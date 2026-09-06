@@ -12,6 +12,7 @@ import Slide from "@/app/components/Slide";
 import SlideCurtain, { type SlideCurtainHandle } from "@/app/components/SlideCurtain";
 import { useSlideNav } from "@/app/hooks/useSlideNav";
 import { SlideModeProvider } from "@/app/lib/slideMode";
+import { onAppReady } from "@/app/lib/appReady";
 
 // ── Supabase enquiries endpoint ────────────────────────────────────────────
 
@@ -313,6 +314,7 @@ export default function App() {
   const isAdmin = window.location.search.includes("admin");
   const heroImgRef = useRef<HTMLImageElement>(null);
   const workshopImgRef = useRef<HTMLImageElement>(null);
+  const aboutImgRef = useRef<HTMLImageElement>(null);
   const curtainRef = useRef<SlideCurtainHandle>(null);
 
   const SLIDE_IDS = ["hero", "work", "process", "about", "quote"];
@@ -325,31 +327,28 @@ export default function App() {
     setScrolled(slideIndex > 0);
   }, [slideIndex]);
 
-  // Subtle parallax drift on the large section images, à la anaiwood.com.
+  // "Grow and settle" motion on the large feature images (à la anaiwood.com):
+  // each starts slightly zoomed-in and eases down to a calmer scale, with a
+  // slow drift, whenever its slide becomes the active one.
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      [heroImgRef, workshopImgRef].forEach((imgRef) => {
-        const img = imgRef.current;
-        const section = img?.closest("section");
-        if (!img || !section) return;
+    const animate = (img: HTMLImageElement | null) => {
+      if (!img) return;
+      const prefersReducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+      if (prefersReducedMotion) return;
+      onAppReady(() => {
         gsap.fromTo(
           img,
-          { yPercent: -8 },
-          {
-            yPercent: 8,
-            ease: "none",
-            scrollTrigger: {
-              trigger: section,
-              start: "top bottom",
-              end: "bottom top",
-              scrub: true,
-            },
-          }
+          { scale: 1.15, yPercent: -3 },
+          { scale: 1.05, yPercent: 3, duration: 7, ease: "sine.out", overwrite: true }
         );
       });
-    });
-    return () => ctx.revert();
-  }, []);
+    };
+    if (slideIndex === 0) animate(heroImgRef.current);
+    if (slideIndex === 1) animate(workshopImgRef.current);
+    if (slideIndex === 3) animate(aboutImgRef.current);
+  }, [slideIndex]);
 
   useEffect(() => {
     fetchContent("he").then((c) => c && setOverrides((o) => ({ ...o, he: c })));
@@ -757,9 +756,10 @@ export default function App() {
             <Reveal as="div" y={0} className="relative">
               <div className="aspect-[3/4] overflow-hidden bg-muted">
                 <img
+                  ref={aboutImgRef}
                   src="https://images.unsplash.com/photo-1631396326646-c06a935ff3a6?w=900&h=1200&fit=crop&auto=format"
                   alt="Oren working in the Pinea Studio workshop"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover scale-110"
                 />
               </div>
             </Reveal>
