@@ -26,7 +26,7 @@ export default function Reveal({
   y = 0,
   scale = 0.98,
   delay = 0,
-  duration = 0.9,
+  duration = 1.4,
   as: Tag = "div",
   scrub = false,
   ...rest
