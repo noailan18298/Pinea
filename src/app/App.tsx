@@ -9,6 +9,7 @@ import { useSmoothScroll, smoothScrollToId } from "@/app/hooks/useSmoothScroll";
 import Reveal from "@/app/components/Reveal";
 import SplitHeading from "@/app/components/SplitHeading";
 import Preloader from "@/app/components/Preloader";
+import ClipReveal from "@/app/components/ClipReveal";
 
 // ── Supabase enquiries endpoint ────────────────────────────────────────────
 
@@ -305,10 +306,12 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeCat, setActiveCat] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [headerHidden, setHeaderHidden] = useState(false);
   const [overrides, setOverrides] = useState<{ he: any; en: any }>({ he: null, en: null });
   const [formStatus, setFormStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const isAdmin = window.location.search.includes("admin");
   const heroImgRef = useRef<HTMLImageElement>(null);
+  const heroWrapRef = useRef<HTMLDivElement>(null);
   const workshopImgRef = useRef<HTMLImageElement>(null);
 
   const t = { ...TRANSLATIONS[lang], ...(overrides[lang] ?? {}) };
@@ -317,7 +320,21 @@ export default function App() {
   useSmoothScroll();
 
   useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 60);
+    let lastY = window.scrollY;
+    const handler = () => {
+      const y = window.scrollY;
+      setScrolled(y > 60);
+      // Hide the header while scrolling down (past the point where it
+      // would overlap the hero anyway), reveal it again the moment the
+      // user scrolls up even slightly — no debounce, so it feels
+      // responsive rather than sticky-static.
+      if (y > lastY && y > 120) {
+        setHeaderHidden(true);
+      } else if (y < lastY) {
+        setHeaderHidden(false);
+      }
+      lastY = y;
+    };
     window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);
   }, []);
@@ -344,6 +361,25 @@ export default function App() {
           }
         );
       });
+
+      // The hero's signature moment: the frame is clipped in tight on load
+      // and opens up to full-bleed during the very first scroll of the
+      // page — as if the image is "painting in" before you move on to the
+      // next section.
+      const heroWrap = heroWrapRef.current;
+      if (heroWrap) {
+        gsap.set(heroWrap, { clipPath: "inset(9% 9% 9% 9%)" });
+        gsap.to(heroWrap, {
+          clipPath: "inset(0% 0% 0% 0%)",
+          ease: "pineaOut",
+          scrollTrigger: {
+            trigger: heroWrap,
+            start: "top top",
+            end: "+=45%",
+            scrub: 0.6,
+          },
+        });
+      }
     });
     return () => ctx.revert();
   }, []);
@@ -419,6 +455,7 @@ export default function App() {
           background: scrolled ? "rgba(15,15,13,0.92)" : "transparent",
           backdropFilter: scrolled ? "blur(12px)" : "none",
           borderBottom: scrolled ? "1px solid rgba(240,234,224,0.08)" : "none",
+          transform: headerHidden && !menuOpen ? "translateY(-100%)" : "translateY(0)",
         }}
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-16">
@@ -486,7 +523,7 @@ export default function App() {
 
       {/* ── HERO ── */}
       <section id="hero" className="relative min-h-screen flex flex-col justify-end pb-24 overflow-hidden pt-10">
-        <div className="absolute inset-0">
+        <div ref={heroWrapRef} className="absolute inset-0 overflow-hidden" style={{ willChange: "clip-path" }}>
           <img
             ref={heroImgRef}
             src="https://images.unsplash.com/photo-1547609434-b732edfee020?w=1800&h=1100&fit=crop&auto=format"
@@ -732,15 +769,12 @@ export default function App() {
       <section id="about" className="py-28">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <Reveal as="div" y={0} className="relative">
-              <div className="aspect-[3/4] overflow-hidden bg-muted">
-                <img
-                  src="https://images.unsplash.com/photo-1631396326646-c06a935ff3a6?w=900&h=1200&fit=crop&auto=format"
-                  alt="Oren working in the Pinea Studio workshop"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </Reveal>
+            <ClipReveal
+              src="https://images.unsplash.com/photo-1631396326646-c06a935ff3a6?w=900&h=1200&fit=crop&auto=format"
+              alt="Oren working in the Pinea Studio workshop"
+              className="relative aspect-[3/4] bg-muted"
+            />
+
 
             <div>
               <Reveal as="p"
