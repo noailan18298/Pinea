@@ -1,5 +1,6 @@
 import { useEffect, useRef, type ReactNode, type ElementType, type CSSProperties } from "react";
 import { gsap, SplitText } from "@/app/lib/gsap";
+import { onAppReady } from "@/app/lib/appReady";
 
 type SplitHeadingProps = {
   children: ReactNode;
@@ -35,59 +36,66 @@ export default function SplitHeading({
     if (prefersReducedMotion) return;
 
     let split: SplitText | undefined;
-    const ctx = gsap.context(() => {
-      split = new SplitText(el, {
-        type,
-        linesClass: "split-line",
-        wordsClass: "split-word",
-        charsClass: "split-char",
-      });
+    let ctx: gsap.Context | undefined;
+    let cancelled = false;
 
-      const targets =
-        type === "chars" ? split.chars : type === "lines" ? split.lines : split.words;
+    onAppReady(() => {
+      if (cancelled || !ref.current) return;
+      ctx = gsap.context(() => {
+        split = new SplitText(el, {
+          type,
+          linesClass: "split-line",
+          wordsClass: "split-word",
+          charsClass: "split-char",
+        });
 
-      if (type === "chars") {
-        // Reference-site technique: characters fade in, in random order,
-        // with no vertical movement or scale — a subtle shimmer.
-        gsap.fromTo(
-          targets,
-          { opacity: 0 },
-          {
-            opacity: 1,
-            duration: 1,
-            delay,
-            ease: "power1.out",
-            stagger: { amount: stagger ?? 0.6, from: "random" },
-            scrollTrigger: {
-              trigger: el,
-              start: "top 88%",
-              toggleActions: "play none none reverse",
-            },
-          }
-        );
-      } else {
-        gsap.fromTo(
-          targets,
-          { opacity: 0, scale: 0.98 },
-          {
-            opacity: 1,
-            scale: 1,
-            duration: 1.8,
-            delay,
-            stagger: stagger ?? 0.18,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: el,
-              start: "top 88%",
-              toggleActions: "play none none reverse",
-            },
-          }
-        );
-      }
-    }, el);
+        const targets =
+          type === "chars" ? split.chars : type === "lines" ? split.lines : split.words;
+
+        if (type === "chars") {
+          // Reference-site technique: characters fade in, in random order,
+          // with no vertical movement or scale — a subtle shimmer.
+          gsap.fromTo(
+            targets,
+            { opacity: 0 },
+            {
+              opacity: 1,
+              duration: 1,
+              delay,
+              ease: "power1.out",
+              stagger: { amount: stagger ?? 0.6, from: "random" },
+              scrollTrigger: {
+                trigger: el,
+                start: "top 88%",
+                toggleActions: "play none none reverse",
+              },
+            }
+          );
+        } else {
+          gsap.fromTo(
+            targets,
+            { opacity: 0, scale: 0.97 },
+            {
+              opacity: 1,
+              scale: 1,
+              duration: 1.2,
+              delay,
+              stagger: stagger ?? 0.12,
+              ease: "power1.out",
+              scrollTrigger: {
+                trigger: el,
+                start: "top 88%",
+                toggleActions: "play none none reverse",
+              },
+            }
+          );
+        }
+      }, el);
+    });
 
     return () => {
-      ctx.revert();
+      cancelled = true;
+      ctx?.revert();
       split?.revert();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
