@@ -72,10 +72,10 @@ export default function SplitHeading({
           {
             opacity: 1,
             scale: 1,
-            duration: 1.1,
+            duration: 1.8,
             delay,
-            stagger: stagger ?? 0.1,
-            ease: "pineaEase",
+            stagger: stagger ?? 0.18,
+            ease: "power2.out",
             scrollTrigger: {
               trigger: el,
               start: "top 88%",
