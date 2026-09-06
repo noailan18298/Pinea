@@ -94,7 +94,7 @@ export default function SplitHeading({
             scrollTrigger: {
               trigger: el,
               start: "top 88%",
-              toggleActions: "play none none reverse",
+              toggleActions: "play none play reverse",
             },
           });
         } else {
@@ -108,7 +108,7 @@ export default function SplitHeading({
             scrollTrigger: {
               trigger: el,
               start: "top 88%",
-              toggleActions: "play none none reverse",
+              toggleActions: "play none play reverse",
             },
           });
         }
