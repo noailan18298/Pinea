@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "@/app/lib/gsap";
+import { markAppReady } from "@/app/lib/appReady";
 
 type PreloaderProps = {
   logoSrc: string;
@@ -22,6 +23,7 @@ export default function Preloader({ logoSrc, logoAlt, onDone }: PreloaderProps) 
     const finish = () => {
       document.body.style.overflow = "";
       setHidden(true);
+      markAppReady();
       onDone?.();
     };
 
