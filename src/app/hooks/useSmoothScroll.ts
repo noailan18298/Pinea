@@ -8,21 +8,15 @@ declare global {
   }
 }
 
-/**
- * Sets up buttery smooth scrolling (Lenis) and keeps GSAP's ScrollTrigger
- * in sync with it, so scroll-linked animations track the smoothed scroll
- * position rather than the raw, stuttery native one.
- */
 export function useSmoothScroll() {
   useEffect(() => {
-    // Respect users who've asked for less motion.
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
     if (prefersReducedMotion) return;
 
     const lenis = new Lenis({
-      duration: 1.2,
+      duration: 0.85,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
       touchMultiplier: 1.2,
@@ -46,7 +40,6 @@ export function useSmoothScroll() {
   }, []);
 }
 
-/** Smoothly scroll to an element by id, using Lenis when available. */
 export function smoothScrollToId(id: string, offset = -64) {
   const el = document.getElementById(id);
   if (!el) return;
