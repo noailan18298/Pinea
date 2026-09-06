@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, type ReactNode, type ElementType, type ComponentPropsWithoutRef } from "react";
 import { gsap } from "@/app/lib/gsap";
 import { onAppReady } from "@/app/lib/appReady";
+import { useSlideMode } from "@/app/lib/slideMode";
 
 type RevealOwnProps = {
   children: ReactNode;
@@ -30,11 +31,13 @@ export default function Reveal({
   ...rest
 }: RevealProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const slideMode = useSlideMode();
 
-  // Hide the element BEFORE the browser paints anything — otherwise it
-  // sits fully visible under the preloader curtain, and the "reveal"
-  // animation ends up flickering instead of fading in.
+  // Inside a slide-based layout, the Slide wrapper itself handles the
+  // fade-in for the whole slide as one unit — skip the scroll-triggered
+  // logic entirely and just render normally.
   useLayoutEffect(() => {
+    if (slideMode) return;
     const el = ref.current;
     if (!el) return;
     const prefersReducedMotion = window.matchMedia(
@@ -46,6 +49,7 @@ export default function Reveal({
   }, []);
 
   useEffect(() => {
+    if (slideMode) return;
     const el = ref.current;
     if (!el) return;
 
@@ -91,8 +95,8 @@ export default function Reveal({
             ease: "none",
             scrollTrigger: {
               trigger: el,
-              start: "top 85%",
-              end: "top 50%",
+              start: "top 90%",
+              end: "center center",
               scrub: 0.4,
             },
           });
