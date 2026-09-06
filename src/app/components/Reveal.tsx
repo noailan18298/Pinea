@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode, type ElementType, type ComponentPropsWithoutRef } from "react";
+import { useEffect, useLayoutEffect, useRef, type ReactNode, type ElementType, type ComponentPropsWithoutRef } from "react";
 import { gsap } from "@/app/lib/gsap";
 import { onAppReady } from "@/app/lib/appReady";
 
@@ -34,6 +34,20 @@ export default function Reveal({
 }: RevealProps) {
   const ref = useRef<HTMLDivElement>(null);
 
+  // Hide the element BEFORE the browser paints anything — otherwise it
+  // sits fully visible under the preloader curtain, and the "reveal"
+  // animation ends up flickering instead of fading in.
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    if (prefersReducedMotion) return;
+    gsap.set(el, { opacity: 0, y, scale });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -49,25 +63,21 @@ export default function Reveal({
     onAppReady(() => {
       if (cancelled || !ref.current) return;
       ctx = gsap.context(() => {
-        gsap.fromTo(
-          el,
-          { opacity: 0, y, scale },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            duration,
-            delay: scrub ? 0 : delay,
-            ease: "power1.out",
-            scrollTrigger: {
-              trigger: el,
-              start: "top 85%",
-              ...(scrub
-                ? { end: "top 45%", scrub: 0.6 }
-                : { toggleActions: "play none none reverse" }),
-            },
-          }
-        );
+        gsap.to(el, {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration,
+          delay: scrub ? 0 : delay,
+          ease: "power1.out",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 85%",
+            ...(scrub
+              ? { end: "top 45%", scrub: 0.6 }
+              : { toggleActions: "play none none reverse" }),
+          },
+        });
       });
     });
 
