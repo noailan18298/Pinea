@@ -327,9 +327,9 @@ export default function App() {
     setScrolled(slideIndex > 0);
   }, [slideIndex]);
 
-  // "Grow and settle" motion on the large feature images (à la anaiwood.com):
-  // each starts slightly zoomed-in and eases down to a calmer scale, with a
-  // slow drift, whenever its slide becomes the active one.
+  // Continuous, living-photo motion on the large feature images (à la
+  // anaiwood.com): a slow, perpetual zoom+pan that never fully settles,
+  // for as long as the slide is active.
   useEffect(() => {
     const animate = (img: HTMLImageElement | null) => {
       if (!img) return;
@@ -338,10 +338,19 @@ export default function App() {
       ).matches;
       if (prefersReducedMotion) return;
       onAppReady(() => {
+        gsap.killTweensOf(img);
         gsap.fromTo(
           img,
-          { scale: 1.15, yPercent: -3 },
-          { scale: 1.05, yPercent: 3, duration: 7, ease: "sine.out", overwrite: true }
+          { scale: 1.08, yPercent: -6, xPercent: -2 },
+          {
+            scale: 1.22,
+            yPercent: 6,
+            xPercent: 2,
+            duration: 9,
+            ease: "sine.inOut",
+            yoyo: true,
+            repeat: -1,
+          }
         );
       });
     };
@@ -596,44 +605,72 @@ export default function App() {
             </Reveal>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-border">
-            {t.categories.map((cat, i) => (
-              <Reveal
-                key={cat.id}
-                delay={(i % 3) * 0.1}
-                className="bg-background group relative overflow-hidden cursor-pointer"
-                onClick={() => setActiveCat(activeCat === cat.id ? null : cat.id)}
-              >
-                <div className="relative overflow-hidden aspect-[4/3] bg-muted">
-                  <img
-                    src={cat.img}
-                    alt={cat.alt}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div
-                    className="absolute inset-0"
-                    style={{ background: "linear-gradient(to top, rgba(15,15,13,0.85) 0%, rgba(15,15,13,0.2) 60%, transparent 100%)" }}
-                  />
-                  <div className="absolute bottom-0 right-0 left-0 p-6">
-                    <h3
-                      className="text-foreground"
-                      style={{ fontFamily: "'Liebling', 'DM Sans', sans-serif", fontWeight: 800, fontSize: "1.6rem" }}
-                    >
-                      {cat.name}
-                    </h3>
-                  </div>
+          {(() => {
+            const currentCat =
+              t.categories.find((c) => c.id === activeCat) ?? t.categories[0];
+            return (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                {/* ── Numbered category list ── */}
+                <div className="order-2 lg:order-1 border-t border-border">
+                  {t.categories.map((cat, i) => {
+                    const isActive = currentCat.id === cat.id;
+                    return (
+                      <button
+                        key={cat.id}
+                        onMouseEnter={() => setActiveCat(cat.id)}
+                        onFocus={() => setActiveCat(cat.id)}
+                        onClick={() => setActiveCat(cat.id)}
+                        className="w-full flex items-baseline gap-5 py-5 border-b border-border transition-colors duration-200 group"
+                        style={{ textAlign: isRtl ? "right" : "left" }}
+                      >
+                        <span
+                          className="transition-colors duration-200"
+                          style={{
+                            fontFamily: "'Karantina', sans-serif",
+                            fontWeight: 700,
+                            fontSize: "1rem",
+                            color: isActive ? "var(--primary)" : "rgba(240,234,224,0.35)",
+                          }}
+                        >
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        <span
+                          className="transition-colors duration-200"
+                          style={{
+                            fontFamily: "'Karantina', sans-serif",
+                            fontWeight: 800,
+                            fontSize: "clamp(1.4rem, 3vw, 2.4rem)",
+                            color: isActive ? "var(--foreground)" : "rgba(240,234,224,0.4)",
+                          }}
+                        >
+                          {cat.name}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
 
-                <div
-                  className="overflow-hidden transition-all duration-500 ease-in-out"
-                  style={{ maxHeight: activeCat === cat.id ? "240px" : "0px" }}
-                >
-                  <div className="p-6 border-t border-border bg-card">
-                    <p className="text-foreground/60 leading-relaxed font-light text-sm mb-5">
-                      {cat.desc}
+                {/* ── Changing image + description ── */}
+                <div className="order-1 lg:order-2 relative aspect-[4/3] overflow-hidden bg-muted">
+                  {t.categories.map((cat) => (
+                    <img
+                      key={cat.id}
+                      src={cat.img}
+                      alt={cat.alt}
+                      className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out"
+                      style={{ opacity: currentCat.id === cat.id ? 1 : 0 }}
+                    />
+                  ))}
+                  <div
+                    className="absolute inset-0"
+                    style={{ background: "linear-gradient(to top, rgba(15,15,13,0.9) 0%, rgba(15,15,13,0.15) 55%, transparent 100%)" }}
+                  />
+                  <div className="absolute bottom-0 inset-x-0 p-6 md:p-8">
+                    <p className="text-foreground/70 text-sm leading-relaxed mb-5 max-w-md font-light">
+                      {currentCat.desc}
                     </p>
                     <button
-                      onClick={(e) => { e.stopPropagation(); openQuote(cat.name); }}
+                      onClick={() => openQuote(currentCat.name)}
                       className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors group/btn"
                       style={{ fontFamily: "'Liebling', 'DM Sans', sans-serif", fontWeight: 700, fontSize: "0.9rem", letterSpacing: "0.08em" }}
                     >
@@ -642,21 +679,9 @@ export default function App() {
                     </button>
                   </div>
                 </div>
-
-                {activeCat !== cat.id && (
-                  <div className="border-t border-border px-6 py-3 flex items-center justify-between bg-background">
-                    <span
-                      className="text-muted-foreground text-xs tracking-wide"
-                      style={{ fontFamily: "'Liebling', 'DM Sans', sans-serif", fontWeight: 700 }}
-                    >
-                      {t.catLearnMore}
-                    </span>
-                    <ChevronDown size={14} className="text-muted-foreground" />
-                  </div>
-                )}
-              </Reveal>
-            ))}
-          </div>
+              </div>
+            );
+          })()}
         </div>
       </section>
 
