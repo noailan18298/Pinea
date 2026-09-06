@@ -9,7 +9,7 @@ import Reveal from "@/app/components/Reveal";
 import SplitHeading from "@/app/components/SplitHeading";
 import Preloader from "@/app/components/Preloader";
 import Slide from "@/app/components/Slide";
-import SlideCurtain, { type SlideCurtainHandle } from "@/app/components/SlideCurtain";
+import GalleryImage from "@/app/components/GalleryImage";
 import { useSlideNav } from "@/app/hooks/useSlideNav";
 import { SlideModeProvider } from "@/app/lib/slideMode";
 import { onAppReady } from "@/app/lib/appReady";
@@ -314,11 +314,9 @@ export default function App() {
   const isAdmin = window.location.search.includes("admin");
   const heroImgRef = useRef<HTMLImageElement>(null);
   const workshopImgRef = useRef<HTMLImageElement>(null);
-  const aboutImgRef = useRef<HTMLImageElement>(null);
-  const curtainRef = useRef<SlideCurtainHandle>(null);
 
   const SLIDE_IDS = ["hero", "work", "process", "about", "quote"];
-  const { index: slideIndex, goTo, registerSlide } = useSlideNav(SLIDE_IDS.length, curtainRef);
+  const { index: slideIndex, goTo, registerSlide } = useSlideNav(SLIDE_IDS.length);
 
   const t = { ...TRANSLATIONS[lang], ...(overrides[lang] ?? {}) };
   const isRtl = lang === "he";
@@ -356,7 +354,6 @@ export default function App() {
     };
     if (slideIndex === 0) animate(heroImgRef.current);
     if (slideIndex === 1) animate(workshopImgRef.current);
-    if (slideIndex === 3) animate(aboutImgRef.current);
   }, [slideIndex]);
 
   useEffect(() => {
@@ -457,7 +454,7 @@ export default function App() {
 
           <div className="hidden md:flex items-center gap-3">
             <button
-              className="flex items-center gap-2 px-5 py-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-[20px]"
+              className="text-primary hover:text-foreground transition-colors duration-200 pb-1 border-b-2 border-primary text-[20px]"
               onClick={() => openQuote()}
               style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 700, letterSpacing: "0.05em" }}
             >
@@ -501,8 +498,6 @@ export default function App() {
       </header>
 
       <SlideModeProvider value={true}>
-      <SlideCurtain ref={curtainRef} logoSrc={isRtl ? pineaLogoHe : pineaLogo} logoAlt={t.logoAlt} />
-
       {/* ── SLIDE PROGRESS INDICATOR ── */}
       {slideIndex < SLIDE_IDS.length - 1 && (
         <div
@@ -807,51 +802,65 @@ export default function App() {
       {/* ── ABOUT ── */}
       <section id="about" className="py-28">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <Reveal as="div" y={0} className="relative">
-              <div className="aspect-[3/4] lg:aspect-[4/5] overflow-hidden bg-muted">
-                <img
-                  ref={aboutImgRef}
-                  src="https://images.unsplash.com/photo-1631396326646-c06a935ff3a6?w=900&h=1200&fit=crop&auto=format"
-                  alt="Oren working in the Pinea Studio workshop"
-                  className="w-full h-full object-cover scale-110"
-                />
-              </div>
+          <div className="max-w-2xl mb-16">
+            <Reveal as="p"
+              className="text-primary tracking-wide uppercase mb-4"
+              style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 500, fontSize: "20px" }}
+            >
+              {t.aboutLabel}
             </Reveal>
-
-            <div>
-              <Reveal as="p"
-                className="text-primary tracking-wide uppercase mb-4"
-                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 500, fontSize: "20px" }}
-              >
-                {t.aboutLabel}
-              </Reveal>
-              <SplitHeading
-                as="h2"
-                className="text-foreground mb-8 leading-none"
-                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 800, fontSize: "clamp(2.2rem, 4vw, 3.5rem)" }}
-              >
-                {t.aboutTitle[0]}<br />{t.aboutTitle[1]}
-              </SplitHeading>
-              <div className="space-y-5 text-foreground/60 leading-relaxed font-light max-w-lg">
-                {t.aboutBody.map((para, i) => (
-                  <Reveal as="p" key={i} delay={i * 0.1}>
-                    {para}
-                  </Reveal>
-                ))}
-              </div>
-
-              <Reveal as="div" delay={0.3} className="mt-10 pt-10 border-t border-border">
-                <button
-                  onClick={() => openQuote()}
-                  className="flex items-center gap-3 px-8 py-4 bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 group"
-                  style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 700, fontSize: "20px", letterSpacing: "0.08em" }}
-                >
-                  {t.aboutBtn}
-                  <Arr size={15} className={`${arrHover} transition-transform`} />
-                </button>
-              </Reveal>
+            <SplitHeading
+              as="h2"
+              className="text-foreground mb-8 leading-none"
+              style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 800, fontSize: "clamp(2.2rem, 4vw, 3.5rem)" }}
+            >
+              {t.aboutTitle[0]}<br />{t.aboutTitle[1]}
+            </SplitHeading>
+            <div className="space-y-5 text-foreground/60 leading-relaxed font-light max-w-lg">
+              {t.aboutBody.map((para, i) => (
+                <Reveal as="p" key={i} delay={i * 0.1}>
+                  {para}
+                </Reveal>
+              ))}
             </div>
+
+            <Reveal as="div" delay={0.3} className="mt-10 pt-10 border-t border-border">
+              <button
+                onClick={() => openQuote()}
+                className="inline-flex items-center gap-3 pb-2 border-b-2 border-primary text-foreground hover:text-primary transition-colors duration-200 group"
+                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 700, fontSize: "20px", letterSpacing: "0.08em" }}
+              >
+                {t.aboutBtn}
+                <Arr size={15} className={`${arrHover} transition-transform`} />
+              </button>
+            </Reveal>
+          </div>
+
+          {/* ── Photo essay: images reveal one by one, at alternating sizes,
+               as you scroll through this slide ── */}
+          <div className="space-y-6 md:space-y-10">
+            <GalleryImage
+              src="https://images.unsplash.com/photo-1631396326646-c06a935ff3a6?w=1600&h=900&fit=crop&auto=format"
+              alt="Oren working in the Pinea Studio workshop"
+              className="aspect-[16/9] w-full"
+            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
+              <GalleryImage
+                src="https://images.unsplash.com/photo-1698770531036-c627d35188f2?w=900&h=1150&fit=crop&auto=format"
+                alt="Solid wood dining table in progress"
+                className="aspect-[4/5]"
+              />
+              <GalleryImage
+                src="https://images.unsplash.com/photo-1564644411733-d11b24daf95e?w=900&h=1150&fit=crop&auto=format"
+                alt="Live-edge coffee table detail"
+                className="aspect-[4/5] md:mt-20"
+              />
+            </div>
+            <GalleryImage
+              src="https://images.unsplash.com/photo-1704428381485-fbdc84a7e58c?w=1600&h=900&fit=crop&auto=format"
+              alt="Steel and wood shelving unit"
+              className="aspect-[16/9] w-full"
+            />
           </div>
         </div>
       </section>
