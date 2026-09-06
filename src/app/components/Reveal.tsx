@@ -24,9 +24,9 @@ export default function Reveal({
   children,
   className = "",
   y = 0,
-  scale = 0.94,
+  scale = 0.98,
   delay = 0,
-  duration = 1.1,
+  duration = 0.9,
   as: Tag = "div",
   scrub = false,
   ...rest
