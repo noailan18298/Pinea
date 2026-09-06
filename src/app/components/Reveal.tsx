@@ -75,7 +75,7 @@ export default function Reveal({
             start: "top 85%",
             ...(scrub
               ? { end: "top 45%", scrub: 0.6 }
-              : { toggleActions: "play none none reverse" }),
+              : { toggleActions: "play none play reverse" }),
           },
         });
       });
