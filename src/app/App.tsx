@@ -366,9 +366,9 @@ export default function App() {
       // and opens up to full-bleed during the very first scroll of the
       // page — as if the image is "painting in" before you move on to the
       // next section.
-      const heroWrap = heroWrapRef.current;
+            const heroWrap = heroWrapRef.current;
       if (heroWrap) {
-        gsap.set(heroWrap, { clipPath: "inset(9% 9% 9% 9%)" });
+        gsap.set(heroWrap, { clipPath: "inset(0% 0% 100% 0%)" });
         gsap.to(heroWrap, {
           clipPath: "inset(0% 0% 0% 0%)",
           ease: "pineaOut",
@@ -376,7 +376,7 @@ export default function App() {
             trigger: heroWrap,
             start: "top top",
             end: "+=45%",
-            scrub: 0.6,
+            scrub: 0.3,
           },
         });
       }
