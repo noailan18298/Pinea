@@ -5,10 +5,13 @@ import pineaLogoHe from "@/imports/Asset_8_4x.png";
 import { fetchContent } from "./api";
 import Admin from "./Admin";
 import { gsap } from "@/app/lib/gsap";
-import { useSmoothScroll, smoothScrollToId } from "@/app/hooks/useSmoothScroll";
 import Reveal from "@/app/components/Reveal";
 import SplitHeading from "@/app/components/SplitHeading";
 import Preloader from "@/app/components/Preloader";
+import Slide from "@/app/components/Slide";
+import SlideCurtain, { type SlideCurtainHandle } from "@/app/components/SlideCurtain";
+import { useSlideNav } from "@/app/hooks/useSlideNav";
+import { SlideModeProvider } from "@/app/lib/slideMode";
 
 // ── Supabase enquiries endpoint ────────────────────────────────────────────
 
@@ -310,17 +313,17 @@ export default function App() {
   const isAdmin = window.location.search.includes("admin");
   const heroImgRef = useRef<HTMLImageElement>(null);
   const workshopImgRef = useRef<HTMLImageElement>(null);
+  const curtainRef = useRef<SlideCurtainHandle>(null);
+
+  const SLIDE_IDS = ["hero", "work", "process", "about", "quote"];
+  const { index: slideIndex, goTo, registerSlide } = useSlideNav(SLIDE_IDS.length, curtainRef);
 
   const t = { ...TRANSLATIONS[lang], ...(overrides[lang] ?? {}) };
   const isRtl = lang === "he";
 
-  useSmoothScroll();
-
   useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 60);
-    window.addEventListener("scroll", handler, { passive: true });
-    return () => window.removeEventListener("scroll", handler);
-  }, []);
+    setScrolled(slideIndex > 0);
+  }, [slideIndex]);
 
   // Subtle parallax drift on the large section images, à la anaiwood.com.
   useEffect(() => {
@@ -354,7 +357,8 @@ export default function App() {
   }, []);
 
   const scrollTo = (id: string) => {
-    smoothScrollToId(id);
+    const i = SLIDE_IDS.indexOf(id);
+    if (i >= 0) goTo(i);
     setMenuOpen(false);
   };
 
@@ -410,7 +414,11 @@ export default function App() {
       className="min-h-screen bg-background text-foreground"
       style={{ fontFamily: "'Liebling', 'DM Sans', sans-serif" }}
     >
-      <Preloader logoSrc={isRtl ? pineaLogoHe : pineaLogo} logoAlt={t.logoAlt} />
+      <Preloader
+        logoSrc={isRtl ? pineaLogoHe : pineaLogo}
+        logoAlt={t.logoAlt}
+        onDone={() => { document.body.style.overflow = "hidden"; }}
+      />
 
       {/* ── NAV ── */}
       <header
@@ -484,7 +492,12 @@ export default function App() {
         )}
       </header>
 
-      {/* ── HERO ── */}
+      <SlideModeProvider value={true}>
+      <SlideCurtain ref={curtainRef} logoSrc={isRtl ? pineaLogoHe : pineaLogo} logoAlt={t.logoAlt} />
+      <div className="relative" style={{ height: "100dvh", overflow: "hidden" }}>
+
+      {/* ── SLIDE 1: HERO ── */}
+      <Slide active={slideIndex === 0} innerRef={registerSlide(0)}>
       <section id="hero" className="relative min-h-screen flex flex-col justify-end pb-24 overflow-hidden pt-10">
         <div className="absolute inset-0">
           <img
@@ -541,9 +554,12 @@ export default function App() {
           </div>
         </div>
       </section>
+      </Slide>
 
+      {/* ── SLIDE 2: WORK ── */}
+      <Slide active={slideIndex === 1} innerRef={registerSlide(1)}>
       {/* ── STATEMENT STRIP ── */}
-      <section className="border-y border-border bg-secondary py-10">
+      <section className="border-y border-border bg-secondary pt-24 pb-10">
         <div className="max-w-7xl mx-auto px-6">
           <SplitHeading
             as="p"
@@ -684,7 +700,10 @@ export default function App() {
           </div>
         </div>
       </section>
+      </Slide>
 
+      {/* ── SLIDE 3: PROCESS ── */}
+      <Slide active={slideIndex === 2} innerRef={registerSlide(2)}>
       {/* ── PROCESS ── */}
       <section id="process" className="py-28 bg-secondary">
         <div className="max-w-7xl mx-auto px-6">
@@ -727,7 +746,10 @@ export default function App() {
           </div>
         </div>
       </section>
+      </Slide>
 
+      {/* ── SLIDE 4: ABOUT ── */}
+      <Slide active={slideIndex === 3} innerRef={registerSlide(3)}>
       {/* ── ABOUT ── */}
       <section id="about" className="py-28">
         <div className="max-w-7xl mx-auto px-6">
@@ -778,7 +800,10 @@ export default function App() {
           </div>
         </div>
       </section>
+      </Slide>
 
+      {/* ── SLIDE 5: QUOTE ── */}
+      <Slide active={slideIndex === 4} innerRef={registerSlide(4)}>
       {/* ── QUOTE FORM ── */}
       <section id="quote" className="py-28 bg-card border-t border-border">
         <div className="max-w-7xl mx-auto px-6">
@@ -920,6 +945,10 @@ export default function App() {
           </div>
         </div>
       </footer>
+      </Slide>
+
+      </div>
+      </SlideModeProvider>
     </div>
   );
 }
