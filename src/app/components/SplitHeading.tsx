@@ -6,9 +6,9 @@ type SplitHeadingProps = {
   className?: string;
   style?: CSSProperties;
   as?: ElementType;
-  /** "chars" (default) mimics the reference site: characters fade in, in random
-   * order, no movement or scale — just a subtle shimmer. "lines"/"words" fall
-   * back to a gentler grow+fade, useful for very long paragraphs. */
+  /** "chars" mimics the reference site: characters fade in, in random
+   * order, no movement or scale — just a subtle shimmer. "lines" (default)
+   * is a gentler grow+fade. */
   type?: "chars" | "lines" | "words";
   stagger?: number;
   delay?: number;
@@ -19,7 +19,7 @@ export default function SplitHeading({
   className = "",
   style,
   as: Tag = "h2",
-  type = "chars",
+  type = "lines",
   stagger,
   delay = 0,
 }: SplitHeadingProps) {
@@ -47,8 +47,6 @@ export default function SplitHeading({
         type === "chars" ? split.chars : type === "lines" ? split.lines : split.words;
 
       if (type === "chars") {
-        // Reference-site technique: characters fade in, in random order,
-        // with no vertical movement or scale — a subtle shimmer.
         gsap.fromTo(
           targets,
           { opacity: 0 },
