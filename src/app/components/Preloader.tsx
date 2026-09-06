@@ -39,19 +39,19 @@ export default function Preloader({ logoSrc, logoAlt, onDone }: PreloaderProps) 
     tl.fromTo(
       logoRef.current,
       { opacity: 0, scale: 0.92 },
-      { opacity: 1, scale: 1, duration: 0.7, ease: "pineaEase" }
+      { opacity: 1, scale: 1, duration: 0.5, ease: "pineaEase" }
     )
       .fromTo(
         barRef.current,
         { scaleX: 0 },
-        { scaleX: 1, duration: 1, ease: "power2.inOut" },
-        "-=0.25"
+        { scaleX: 1, duration: 0.7, ease: "power2.inOut" },
+        "-=0.2"
       )
-      .to(logoRef.current, { opacity: 0, duration: 0.35 }, "+=0.2")
-      .to(barTrackRef.current, { opacity: 0, duration: 0.25 }, "<")
+      .to(logoRef.current, { opacity: 0, duration: 0.25 }, "+=0.05")
+      .to(barTrackRef.current, { opacity: 0, duration: 0.2 }, "<")
       .to(
         overlayRef.current,
-        { yPercent: -100, duration: 0.85, ease: "pineaEase" },
+        { yPercent: -100, duration: 0.7, ease: "pineaEase" },
         "-=0.05"
       );
 
