@@ -502,6 +502,28 @@ export default function App() {
 
       <SlideModeProvider value={true}>
       <SlideCurtain ref={curtainRef} logoSrc={isRtl ? pineaLogoHe : pineaLogo} logoAlt={t.logoAlt} />
+
+      {/* ── SLIDE PROGRESS INDICATOR ── */}
+      {slideIndex < SLIDE_IDS.length - 1 && (
+        <div
+          className="fixed bottom-6 z-40 flex items-center gap-3"
+          style={{ [isRtl ? "left" : "right"]: "1.5rem" }}
+        >
+          <span
+            className="text-primary"
+            style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 700, fontSize: "18px" }}
+          >
+            {String(slideIndex + 1).padStart(2, "0")}
+          </span>
+          <span className="w-6 h-px bg-foreground/25" />
+          <span
+            className="text-foreground/35"
+            style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 700, fontSize: "18px" }}
+          >
+            {String(SLIDE_IDS.length).padStart(2, "0")}
+          </span>
+        </div>
+      )}
       <div className="relative" style={{ height: "100dvh", overflow: "hidden" }}>
 
       {/* ── SLIDE 1: HERO ── */}
@@ -747,24 +769,32 @@ export default function App() {
             </SplitHeading>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-border">
+          <div className="border-t border-border">
             {t.processSteps.map((step, i) => (
-              <Reveal key={step.num} delay={i * 0.12} className="bg-secondary p-10">
-                <div
-                  className="text-primary mb-8"
-                  style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 800, fontSize: "4rem", lineHeight: 1 }}
-                >
-                  {step.num}
+              <Reveal
+                key={step.num}
+                delay={i * 0.1}
+                className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-12 items-start py-10 border-b border-border"
+              >
+                <div className="md:col-span-3">
+                  <div
+                    className="text-primary"
+                    style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 800, fontSize: "clamp(3.5rem, 8vw, 6rem)", lineHeight: 1 }}
+                  >
+                    {step.num}
+                  </div>
                 </div>
-                <h3
-                  className="text-foreground mb-0"
-                  style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 700, fontSize: "1.5rem" }}
-                >
-                  {step.title}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed font-light text-sm">
-                  {step.body}
-                </p>
+                <div className="md:col-span-9">
+                  <h3
+                    className="text-foreground mb-3"
+                    style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 700, fontSize: "clamp(1.5rem, 3vw, 2.2rem)" }}
+                  >
+                    {step.title}
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed font-light max-w-xl">
+                    {step.body}
+                  </p>
+                </div>
               </Reveal>
             ))}
           </div>
@@ -779,7 +809,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <Reveal as="div" y={0} className="relative">
-              <div className="aspect-[3/4] overflow-hidden bg-muted">
+              <div className="aspect-[3/4] lg:aspect-[4/5] overflow-hidden bg-muted">
                 <img
                   ref={aboutImgRef}
                   src="https://images.unsplash.com/photo-1631396326646-c06a935ff3a6?w=900&h=1200&fit=crop&auto=format"
@@ -799,13 +829,13 @@ export default function App() {
               <SplitHeading
                 as="h2"
                 className="text-foreground mb-8 leading-none"
-                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 800, fontSize: "clamp(1.75rem, 3vw, 2.75rem)" }}
+                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 800, fontSize: "clamp(2.2rem, 4vw, 3.5rem)" }}
               >
                 {t.aboutTitle[0]}<br />{t.aboutTitle[1]}
               </SplitHeading>
-              <div className="space-y-5 text-foreground/60 leading-relaxed font-light">
+              <div className="space-y-5 text-foreground/60 leading-relaxed font-light max-w-lg">
                 {t.aboutBody.map((para, i) => (
-                  <Reveal as="p" key={i} delay={i * 0.1} className="mx-[32px] mt-[30px] mb-[0px]">
+                  <Reveal as="p" key={i} delay={i * 0.1}>
                     {para}
                   </Reveal>
                 ))}
@@ -876,14 +906,14 @@ export default function App() {
               className="lg:col-span-3 space-y-5"
               onSubmit={handleQuoteSubmit}
             >
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-xs tracking-wide uppercase text-muted-foreground mb-2"
                     style={{ fontFamily: "'Liebling', 'DM Sans', sans-serif", fontWeight: 700 }}>
                     {t.formName}
                   </label>
                   <input type="text" name="name" required placeholder={t.formNamePh}
-                    className="w-full bg-secondary border border-border text-foreground placeholder-muted-foreground/50 px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors" />
+                    className="w-full bg-transparent border-0 border-b border-border text-foreground placeholder-muted-foreground/50 px-0 py-3 text-base focus:outline-none focus:border-primary transition-colors" />
                 </div>
                 <div>
                   <label className="block text-xs tracking-wide uppercase text-muted-foreground mb-2"
@@ -891,7 +921,7 @@ export default function App() {
                     {t.formContact}
                   </label>
                   <input type="text" name="contact" required placeholder={t.formContactPh}
-                    className="w-full bg-secondary border border-border text-foreground placeholder-muted-foreground/50 px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors" />
+                    className="w-full bg-transparent border-0 border-b border-border text-foreground placeholder-muted-foreground/50 px-0 py-3 text-base focus:outline-none focus:border-primary transition-colors" />
                 </div>
               </div>
 
@@ -902,11 +932,11 @@ export default function App() {
                 </label>
                 <div className="relative">
                   <select id="category-select" name="pieceType"
-                    className="w-full bg-secondary border border-border text-foreground px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors appearance-none pr-4 pl-10">
+                    className="w-full bg-transparent border-0 border-b border-border text-foreground px-0 py-3 text-base focus:outline-none focus:border-primary transition-colors appearance-none pl-8">
                     <option value="">{t.formTypePh}</option>
                     {t.formTypeOpts.map((o) => <option key={o}>{o}</option>)}
                   </select>
-                  <ChevronDown size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                  <ChevronDown size={14} className="absolute left-0 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
                 </div>
               </div>
 
@@ -915,8 +945,8 @@ export default function App() {
                   style={{ fontFamily: "'Liebling', 'DM Sans', sans-serif", fontWeight: 700 }}>
                   {t.formDesc}
                 </label>
-                <textarea name="description" required rows={5} placeholder={t.formDescPh}
-                  className="w-full bg-secondary border border-border text-foreground placeholder-muted-foreground/50 px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors resize-none" />
+                <textarea name="description" required rows={4} placeholder={t.formDescPh}
+                  className="w-full bg-transparent border-0 border-b border-border text-foreground placeholder-muted-foreground/50 px-0 py-3 text-base focus:outline-none focus:border-primary transition-colors resize-none" />
               </div>
 
               <div>
@@ -925,11 +955,11 @@ export default function App() {
                   {t.formBudget}
                 </label>
                 <div className="relative">
-                  <select name="budgetRange" className="w-full bg-secondary border border-border text-foreground px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors appearance-none pr-4 pl-10">
+                  <select name="budgetRange" className="w-full bg-transparent border-0 border-b border-border text-foreground px-0 py-3 text-base focus:outline-none focus:border-primary transition-colors appearance-none pl-8">
                     <option value="">{t.formBudgetPh}</option>
                     {t.formBudgetOpts.map((o) => <option key={o}>{o}</option>)}
                   </select>
-                  <ChevronDown size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                  <ChevronDown size={14} className="absolute left-0 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
                 </div>
                 <p className="text-muted-foreground text-xs mt-2 font-light">{t.formBudgetNote}</p>
               </div>
