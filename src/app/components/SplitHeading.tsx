@@ -80,39 +80,72 @@ export default function SplitHeading({
 
     onAppReady(() => {
       if (cancelled || !ref.current || !targetsRef.current.length) return;
+      const el = ref.current;
       const targets = targetsRef.current;
+
+      // Same rule as Reveal: headings already on screen at load (e.g. the
+      // Hero) get a one-time, gently-timed entrance. Everything else is
+      // tied directly to scroll position in both directions, so scrolling
+      // up even a little immediately starts reversing it.
+      const alreadyInView = el.getBoundingClientRect().top < window.innerHeight * 0.88;
+
       ctx = gsap.context(() => {
-        if (type === "chars") {
-          // Reference-site technique: characters fade in, in random order,
-          // with no vertical movement or scale — a subtle shimmer.
+        if (alreadyInView) {
+          if (type === "chars") {
+            gsap.to(targets, {
+              opacity: 1,
+              duration: 1,
+              delay,
+              ease: "power1.out",
+              stagger: { amount: stagger ?? 0.6, from: "random" },
+              scrollTrigger: {
+                trigger: el,
+                start: "top 88%",
+                toggleActions: "play none play reverse",
+              },
+            });
+          } else {
+            gsap.to(targets, {
+              opacity: 1,
+              scale: 1,
+              duration: 1.2,
+              delay,
+              stagger: stagger ?? 0.12,
+              ease: "power1.out",
+              scrollTrigger: {
+                trigger: el,
+                start: "top 88%",
+                toggleActions: "play none play reverse",
+              },
+            });
+          }
+        } else if (type === "chars") {
           gsap.to(targets, {
             opacity: 1,
-            duration: 1,
-            delay,
-            ease: "power1.out",
+            ease: "none",
             stagger: { amount: stagger ?? 0.6, from: "random" },
             scrollTrigger: {
               trigger: el,
               start: "top 88%",
-              toggleActions: "play none play reverse",
+              end: "top 55%",
+              scrub: 0.4,
             },
           });
         } else {
           gsap.to(targets, {
             opacity: 1,
             scale: 1,
-            duration: 1.2,
-            delay,
+            ease: "none",
             stagger: stagger ?? 0.12,
-            ease: "power1.out",
             scrollTrigger: {
               trigger: el,
               start: "top 88%",
-              toggleActions: "play none play reverse",
+              end: "top 55%",
+              scrub: 0.4,
             },
           });
         }
-      }, el);
+      });
     });
 
     return () => {
