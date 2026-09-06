@@ -1,5 +1,6 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { gsap } from "@/app/lib/gsap";
+import { onAppReady } from "@/app/lib/appReady";
 
 type SlideProps = {
   active: boolean;
@@ -24,11 +25,16 @@ export default function Slide({ active, children, className = "", innerRef }: Sl
       if (prefersReducedMotion) {
         gsap.set(el, { opacity: 1, y: 0, scale: 1 });
       } else {
-        gsap.fromTo(
-          el,
-          { opacity: 0, y: 24, scale: 0.97 },
-          { opacity: 1, y: 0, scale: 1, duration: 0.8, delay: 0.15, ease: "power1.out" }
-        );
+        // Wait for the preloader curtain to fully finish before playing —
+        // otherwise this (the Hero, active from the very first render)
+        // finishes animating while still hidden behind the loading screen.
+        onAppReady(() => {
+          gsap.fromTo(
+            el,
+            { opacity: 0, y: 24, scale: 0.97 },
+            { opacity: 1, y: 0, scale: 1, duration: 0.8, delay: 0.15, ease: "power1.out" }
+          );
+        });
       }
     }
     wasActive.current = active;
