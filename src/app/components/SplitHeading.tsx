@@ -18,7 +18,7 @@ export default function SplitHeading({
   style,
   as: Tag = "h2",
   type = "lines",
-  stagger = 0.08,
+  stagger = 0.14,
   delay = 0,
 }: SplitHeadingProps) {
   const ref = useRef<HTMLHeadingElement>(null);
@@ -36,7 +36,6 @@ export default function SplitHeading({
     const ctx = gsap.context(() => {
       split = new SplitText(el, {
         type,
-        mask: type,
         linesClass: "split-line",
         wordsClass: "split-word",
       });
@@ -45,11 +44,11 @@ export default function SplitHeading({
 
       gsap.fromTo(
         targets,
-        { yPercent: 110, opacity: 0 },
+        { opacity: 0, scale: 0.92 },
         {
-          yPercent: 0,
           opacity: 1,
-          duration: 1,
+          scale: 1,
+          duration: 1.4,
           delay,
           stagger,
           ease: "pineaEase",

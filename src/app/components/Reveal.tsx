@@ -4,8 +4,10 @@ import { gsap } from "@/app/lib/gsap";
 type RevealOwnProps = {
   children: ReactNode;
   className?: string;
-  /** Pixels to travel on the way in. */
+  /** Pixels to travel on the way in (0 = no slide, just fade+grow). */
   y?: number;
+  /** Starting scale — the element grows from this to 1 as it reveals. */
+  scale?: number;
   /** Stagger delay in seconds — pass index * 0.08 for grouped items. */
   delay?: number;
   duration?: number;
@@ -21,9 +23,10 @@ type RevealProps = RevealOwnProps &
 export default function Reveal({
   children,
   className = "",
-  y = 36,
+  y = 0,
+  scale = 0.94,
   delay = 0,
-  duration = 1,
+  duration = 1.1,
   as: Tag = "div",
   scrub = false,
   ...rest
@@ -42,10 +45,11 @@ export default function Reveal({
     const ctx = gsap.context(() => {
       gsap.fromTo(
         el,
-        { opacity: 0, y },
+        { opacity: 0, y, scale },
         {
           opacity: 1,
           y: 0,
+          scale: 1,
           duration,
           delay: scrub ? 0 : delay,
           ease: "pineaEase",
