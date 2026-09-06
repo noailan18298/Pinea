@@ -1,5 +1,6 @@
 import { useEffect, useRef, type ReactNode, type ElementType, type ComponentPropsWithoutRef } from "react";
 import { gsap } from "@/app/lib/gsap";
+import { onAppReady } from "@/app/lib/appReady";
 
 type RevealOwnProps = {
   children: ReactNode;
@@ -24,9 +25,9 @@ export default function Reveal({
   children,
   className = "",
   y = 0,
-  scale = 0.98,
+  scale = 0.97,
   delay = 0,
-  duration = 1.4,
+  duration = 1.1,
   as: Tag = "div",
   scrub = false,
   ...rest
@@ -42,29 +43,38 @@ export default function Reveal({
     ).matches;
     if (prefersReducedMotion) return;
 
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        el,
-        { opacity: 0, y, scale },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration,
-          delay: scrub ? 0 : delay,
-          ease: "pineaEase",
-          scrollTrigger: {
-            trigger: el,
-            start: "top 85%",
-            ...(scrub
-              ? { end: "top 45%", scrub: 0.6 }
-              : { toggleActions: "play none none reverse" }),
-          },
-        }
-      );
+    let ctx: gsap.Context | undefined;
+    let cancelled = false;
+
+    onAppReady(() => {
+      if (cancelled || !ref.current) return;
+      ctx = gsap.context(() => {
+        gsap.fromTo(
+          el,
+          { opacity: 0, y, scale },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration,
+            delay: scrub ? 0 : delay,
+            ease: "power1.out",
+            scrollTrigger: {
+              trigger: el,
+              start: "top 85%",
+              ...(scrub
+                ? { end: "top 45%", scrub: 0.6 }
+                : { toggleActions: "play none none reverse" }),
+            },
+          }
+        );
+      });
     });
 
-    return () => ctx.revert();
+    return () => {
+      cancelled = true;
+      ctx?.revert();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
