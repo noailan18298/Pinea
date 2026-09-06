@@ -14,8 +14,6 @@ type RevealOwnProps = {
   duration?: number;
   /** Element tag to render as (defaults to div). */
   as?: ElementType;
-  /** Scrub the animation to scroll position instead of a one-shot play. */
-  scrub?: boolean;
 };
 
 type RevealProps = RevealOwnProps &
@@ -29,7 +27,6 @@ export default function Reveal({
   delay = 0,
   duration = 1.1,
   as: Tag = "div",
-  scrub = false,
   ...rest
 }: RevealProps) {
   const ref = useRef<HTMLDivElement>(null);
@@ -62,22 +59,44 @@ export default function Reveal({
 
     onAppReady(() => {
       if (cancelled || !ref.current) return;
+      const el = ref.current;
+
+      // Content already sitting in view when the page loads (e.g. the Hero)
+      // gets a one-time, gently-timed entrance — there's no "scroll up" to
+      // react to since it's already at the very top of the page. Everything
+      // else is tied directly to scroll position, in both directions, so
+      // scrolling up even a little immediately starts reversing it.
+      const alreadyInView = el.getBoundingClientRect().top < window.innerHeight * 0.85;
+
       ctx = gsap.context(() => {
-        gsap.to(el, {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration,
-          delay: scrub ? 0 : delay,
-          ease: "power1.out",
-          scrollTrigger: {
-            trigger: el,
-            start: "top 85%",
-            ...(scrub
-              ? { end: "top 45%", scrub: 0.6 }
-              : { toggleActions: "play none play reverse" }),
-          },
-        });
+        if (alreadyInView) {
+          gsap.to(el, {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration,
+            delay,
+            ease: "power1.out",
+            scrollTrigger: {
+              trigger: el,
+              start: "top 85%",
+              toggleActions: "play none play reverse",
+            },
+          });
+        } else {
+          gsap.to(el, {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            ease: "none",
+            scrollTrigger: {
+              trigger: el,
+              start: "top 85%",
+              end: "top 50%",
+              scrub: 0.4,
+            },
+          });
+        }
       });
     });
 
