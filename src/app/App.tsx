@@ -8,6 +8,7 @@ import { gsap } from "@/app/lib/gsap";
 import { useSmoothScroll, smoothScrollToId } from "@/app/hooks/useSmoothScroll";
 import Reveal from "@/app/components/Reveal";
 import SplitHeading from "@/app/components/SplitHeading";
+import Preloader from "@/app/components/Preloader";
 
 // ── Supabase enquiries endpoint ────────────────────────────────────────────
 
@@ -409,6 +410,8 @@ export default function App() {
       className="min-h-screen bg-background text-foreground"
       style={{ fontFamily: "'Liebling', 'DM Sans', sans-serif" }}
     >
+      <Preloader logoSrc={isRtl ? pineaLogoHe : pineaLogo} logoAlt={t.logoAlt} />
+
       {/* ── NAV ── */}
       <header
         className="fixed top-0 inset-x-0 z-50 transition-all duration-300"
@@ -583,7 +586,6 @@ export default function App() {
               <Reveal
                 key={cat.id}
                 delay={(i % 3) * 0.1}
-                y={28}
                 className="bg-background group relative overflow-hidden cursor-pointer"
                 onClick={() => setActiveCat(activeCat === cat.id ? null : cat.id)}
               >
@@ -820,7 +822,6 @@ export default function App() {
 
             <Reveal
               as="form"
-              y={28}
               delay={0.15}
               className="lg:col-span-3 space-y-5"
               onSubmit={handleQuoteSubmit}
