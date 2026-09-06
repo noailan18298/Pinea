@@ -307,7 +307,6 @@ export default function App() {
   const [scrolled, setScrolled] = useState(false);
   const [overrides, setOverrides] = useState<{ he: any; en: any }>({ he: null, en: null });
   const [formStatus, setFormStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
-  const [ready, setReady] = useState(false);
   const isAdmin = window.location.search.includes("admin");
   const heroImgRef = useRef<HTMLImageElement>(null);
   const workshopImgRef = useRef<HTMLImageElement>(null);
@@ -411,14 +410,8 @@ export default function App() {
       className="min-h-screen bg-background text-foreground"
       style={{ fontFamily: "'Liebling', 'DM Sans', sans-serif" }}
     >
-      <Preloader
-        logoSrc={isRtl ? pineaLogoHe : pineaLogo}
-        logoAlt={t.logoAlt}
-        onDone={() => setReady(true)}
-      />
+      <Preloader logoSrc={isRtl ? pineaLogoHe : pineaLogo} logoAlt={t.logoAlt} />
 
-      {ready && (
-      <>
       {/* ── NAV ── */}
       <header
         className="fixed top-0 inset-x-0 z-50 transition-all duration-300"
@@ -927,8 +920,6 @@ export default function App() {
           </div>
         </div>
       </footer>
-      </>
-      )}
     </div>
   );
 }
