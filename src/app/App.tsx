@@ -1,9 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Menu, X, ArrowLeft, ArrowRight, ChevronDown, Instagram, Phone, Mail, MapPin } from "lucide-react";
 import pineaLogo from "@/imports/Asset_9_4x.png";
 import pineaLogoHe from "@/imports/Asset_8_4x.png";
 import { fetchContent } from "./api";
 import Admin from "./Admin";
+import { gsap } from "@/app/lib/gsap";
+import { useSmoothScroll, smoothScrollToId } from "@/app/hooks/useSmoothScroll";
+import Reveal from "@/app/components/Reveal";
+import SplitHeading from "@/app/components/SplitHeading";
 
 // ── Supabase enquiries endpoint ────────────────────────────────────────────
 
@@ -303,14 +307,44 @@ export default function App() {
   const [overrides, setOverrides] = useState<{ he: any; en: any }>({ he: null, en: null });
   const [formStatus, setFormStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const isAdmin = window.location.search.includes("admin");
+  const heroImgRef = useRef<HTMLImageElement>(null);
+  const workshopImgRef = useRef<HTMLImageElement>(null);
 
   const t = { ...TRANSLATIONS[lang], ...(overrides[lang] ?? {}) };
   const isRtl = lang === "he";
+
+  useSmoothScroll();
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 60);
     window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);
+  }, []);
+
+  // Subtle parallax drift on the large section images, à la anaiwood.com.
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      [heroImgRef, workshopImgRef].forEach((imgRef) => {
+        const img = imgRef.current;
+        const section = img?.closest("section");
+        if (!img || !section) return;
+        gsap.fromTo(
+          img,
+          { yPercent: -8 },
+          {
+            yPercent: 8,
+            ease: "none",
+            scrollTrigger: {
+              trigger: section,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: true,
+            },
+          }
+        );
+      });
+    });
+    return () => ctx.revert();
   }, []);
 
   useEffect(() => {
@@ -319,7 +353,7 @@ export default function App() {
   }, []);
 
   const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    smoothScrollToId(id);
     setMenuOpen(false);
   };
 
@@ -451,33 +485,36 @@ export default function App() {
       <section id="hero" className="relative min-h-screen flex flex-col justify-end pb-24 overflow-hidden pt-10">
         <div className="absolute inset-0">
           <img
+            ref={heroImgRef}
             src="https://images.unsplash.com/photo-1547609434-b732edfee020?w=1800&h=1100&fit=crop&auto=format"
             alt={t.logoAlt}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover scale-110"
           />
           <div className="absolute inset-0" style={{ background: "linear-gradient(to top, #0F0F0D 0%, rgba(15,15,13,0.6) 50%, rgba(15,15,13,0.25) 100%)" }} />
         </div>
 
         <div className="relative max-w-7xl mx-auto px-6 w-full mt-[80px]">
           <div className="max-w-3xl">
-            <p
+            <Reveal as="p"
               className="text-primary tracking-wide uppercase text-[36px] m-[0px]"
               style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 500 }}
             >
               {t.heroBadge}
-            </p>
-            <h1
+            </Reveal>
+            <SplitHeading
+              as="h1"
               className="text-foreground leading-none mb-6"
               style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 700, fontSize: "clamp(5rem, 10vw, 7rem)", letterSpacing: "0" }}
+              delay={0.15}
             >
               {t.heroH1[0]}<br />
               <span className="text-primary">{t.heroH1[1]}</span><br />
               {t.heroH1[2]}
-            </h1>
-            <p className="text-foreground/55 text-lg max-w-xl mb-10 leading-relaxed font-normal">
+            </SplitHeading>
+            <Reveal as="p" delay={0.5} className="text-foreground/55 text-lg max-w-xl mb-10 leading-relaxed font-normal">
               {t.heroBody}
-            </p>
-            <div className="flex flex-wrap gap-4">
+            </Reveal>
+            <Reveal as="div" delay={0.65} className="flex flex-wrap gap-4">
               <button
                 onClick={() => openQuote()}
                 className="flex items-center gap-3 px-8 py-4 bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 group"
@@ -493,7 +530,7 @@ export default function App() {
               >
                 {t.heroBtn2}
               </button>
-            </div>
+            </Reveal>
           </div>
           <div className="mt-20 flex items-center gap-3 text-foreground/25">
             <div className="w-8 h-px bg-foreground/25" />
@@ -505,12 +542,15 @@ export default function App() {
       {/* ── STATEMENT STRIP ── */}
       <section className="border-y border-border bg-secondary py-10">
         <div className="max-w-7xl mx-auto px-6">
-          <p
+          <SplitHeading
+            as="p"
+            type="words"
+            stagger={0.03}
             className="text-center text-foreground/50 tracking-wide"
             style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 500, fontSize: "28px" }}
           >
             {t.strip}
-          </p>
+          </SplitHeading>
         </div>
       </section>
 
@@ -519,28 +559,31 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16">
             <div>
-              <p
+              <Reveal as="p"
                 className="text-primary tracking-wide uppercase mb-3 text-[20px]"
                 style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 500 }}
               >
                 {t.workLabel}
-              </p>
-              <h2
+              </Reveal>
+              <SplitHeading
+                as="h2"
                 className="text-foreground leading-none"
                 style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 800, fontSize: "clamp(1.8rem, 3.5vw, 3rem)" }}
               >
                 {t.workTitle}
-              </h2>
+              </SplitHeading>
             </div>
-            <p className="text-muted-foreground max-w-sm leading-relaxed font-light text-sm">
+            <Reveal as="p" delay={0.2} className="text-muted-foreground max-w-sm leading-relaxed font-light text-sm">
               {t.workSubtitle}
-            </p>
+            </Reveal>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-border">
-            {t.categories.map((cat) => (
-              <div
+            {t.categories.map((cat, i) => (
+              <Reveal
                 key={cat.id}
+                delay={(i % 3) * 0.1}
+                y={28}
                 className="bg-background group relative overflow-hidden cursor-pointer"
                 onClick={() => setActiveCat(activeCat === cat.id ? null : cat.id)}
               >
@@ -594,7 +637,7 @@ export default function App() {
                     <ChevronDown size={14} className="text-muted-foreground" />
                   </div>
                 )}
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -603,34 +646,38 @@ export default function App() {
       {/* ── WORKSHOP INTERLUDE ── */}
       <section className="relative h-72 md:h-[28rem] overflow-hidden">
         <img
+          ref={workshopImgRef}
           src="https://images.unsplash.com/photo-1506599667882-385dd6673353?w=1800&h=700&fit=crop&auto=format"
           alt="Welding steel in the Pinea Studio workshop"
-          className="w-full h-full object-cover object-center"
+          className="w-full h-full object-cover object-center scale-110"
         />
         <div className="absolute inset-0" style={{ background: isRtl ? "linear-gradient(to left, rgba(15,15,13,0.88) 0%, rgba(15,15,13,0.25) 100%)" : "linear-gradient(to right, rgba(15,15,13,0.88) 0%, rgba(15,15,13,0.25) 100%)" }} />
         <div className="absolute inset-0 flex items-center">
           <div className="max-w-7xl mx-auto px-6 w-full flex justify-start">
             <div className="max-w-lg">
-              <p
+              <Reveal as="p"
                 className="text-primary tracking-wide uppercase text-[20px] m-[0px]"
                 style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 500 }}
               >
                 {t.workshopLabel}
-              </p>
-              <h2
+              </Reveal>
+              <SplitHeading
+                as="h2"
                 className="text-foreground mb-6"
                 style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 800, fontSize: "48px", lineHeight: 1.05 }}
               >
                 {t.workshopH2[0]}<br />{t.workshopH2[1]}<br />{t.workshopH2[2]}
-              </h2>
-              <button
-                onClick={() => openQuote()}
-                className="flex items-center gap-3 px-8 py-4 bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 group"
-                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 700, fontSize: "20px", letterSpacing: "0.08em" }}
-              >
-                {t.workshopBtn}
-                <Arr size={15} className={`${arrHover} transition-transform`} />
-              </button>
+              </SplitHeading>
+              <Reveal as="div" delay={0.35}>
+                <button
+                  onClick={() => openQuote()}
+                  className="flex items-center gap-3 px-8 py-4 bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 group"
+                  style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 700, fontSize: "20px", letterSpacing: "0.08em" }}
+                >
+                  {t.workshopBtn}
+                  <Arr size={15} className={`${arrHover} transition-transform`} />
+                </button>
+              </Reveal>
             </div>
           </div>
         </div>
@@ -640,23 +687,24 @@ export default function App() {
       <section id="process" className="py-28 bg-secondary">
         <div className="max-w-7xl mx-auto px-6">
           <div className="mb-16">
-            <p
+            <Reveal as="p"
               className="text-primary tracking-wide uppercase mb-0"
               style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 500, fontSize: "20px" }}
             >
               {t.processLabel}
-            </p>
-            <h2
+            </Reveal>
+            <SplitHeading
+              as="h2"
               className="text-foreground"
               style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 800, fontSize: "clamp(1.8rem, 3.5vw, 3rem)" }}
             >
               {t.processTitle}
-            </h2>
+            </SplitHeading>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-border">
-            {t.processSteps.map((step) => (
-              <div key={step.num} className="bg-secondary p-10">
+            {t.processSteps.map((step, i) => (
+              <Reveal key={step.num} delay={i * 0.12} className="bg-secondary p-10">
                 <div
                   className="text-primary mb-8"
                   style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 800, fontSize: "4rem", lineHeight: 1 }}
@@ -672,7 +720,7 @@ export default function App() {
                 <p className="text-muted-foreground leading-relaxed font-light text-sm">
                   {step.body}
                 </p>
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -682,7 +730,7 @@ export default function App() {
       <section id="about" className="py-28">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div className="relative">
+            <Reveal as="div" y={0} className="relative">
               <div className="aspect-[3/4] overflow-hidden bg-muted">
                 <img
                   src="https://images.unsplash.com/photo-1631396326646-c06a935ff3a6?w=900&h=1200&fit=crop&auto=format"
@@ -690,26 +738,31 @@ export default function App() {
                   className="w-full h-full object-cover"
                 />
               </div>
-            </div>
+            </Reveal>
 
             <div>
-              <p
+              <Reveal as="p"
                 className="text-primary tracking-wide uppercase mb-4"
                 style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 500, fontSize: "20px" }}
               >
                 {t.aboutLabel}
-              </p>
-              <h2
+              </Reveal>
+              <SplitHeading
+                as="h2"
                 className="text-foreground mb-8 leading-none"
                 style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 800, fontSize: "clamp(1.75rem, 3vw, 2.75rem)" }}
               >
                 {t.aboutTitle[0]}<br />{t.aboutTitle[1]}
-              </h2>
+              </SplitHeading>
               <div className="space-y-5 text-foreground/60 leading-relaxed font-light">
-                {t.aboutBody.map((para, i) => <p key={i} className="mx-[32px] mt-[30px] mb-[0px]">{para}</p>)}
+                {t.aboutBody.map((para, i) => (
+                  <Reveal as="p" key={i} delay={i * 0.1} className="mx-[32px] mt-[30px] mb-[0px]">
+                    {para}
+                  </Reveal>
+                ))}
               </div>
 
-              <div className="mt-10 pt-10 border-t border-border">
+              <Reveal as="div" delay={0.3} className="mt-10 pt-10 border-t border-border">
                 <button
                   onClick={() => openQuote()}
                   className="flex items-center gap-3 px-8 py-4 bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 group"
@@ -718,7 +771,7 @@ export default function App() {
                   {t.aboutBtn}
                   <Arr size={15} className={`${arrHover} transition-transform`} />
                 </button>
-              </div>
+              </Reveal>
             </div>
           </div>
         </div>
@@ -729,21 +782,22 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-16 items-start">
             <div className="lg:col-span-2">
-              <p
+              <Reveal as="p"
                 className="text-primary tracking-wide uppercase mb-4"
                 style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 500, fontSize: "20px" }}
               >
                 {t.quoteLabel}
-              </p>
-              <h2
+              </Reveal>
+              <SplitHeading
+                as="h2"
                 className="text-foreground mb-6 leading-none"
                 style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 800, fontSize: "clamp(1.8rem, 3vw, 2.8rem)" }}
               >
                 {t.quoteTitle[0]}<br />{t.quoteTitle[1]}<br />{t.quoteTitle[2]}
-              </h2>
-              <p className="text-muted-foreground leading-relaxed font-light text-sm mb-10">
+              </SplitHeading>
+              <Reveal as="p" delay={0.2} className="text-muted-foreground leading-relaxed font-light text-sm mb-10">
                 {t.quoteSubtitle}
-              </p>
+              </Reveal>
 
               <div className="space-y-6">
                 {[
@@ -751,20 +805,23 @@ export default function App() {
                   { icon: <Mail size={15} />, ...t.contacts[1] },
                   { icon: <MapPin size={15} />, ...t.contacts[2] },
                   { icon: <Instagram size={15} />, ...t.contacts[3] },
-                ].map(({ icon, label, value }) => (
-                  <div key={label} className="flex items-start gap-3">
+                ].map(({ icon, label, value }, i) => (
+                  <Reveal as="div" key={label} delay={0.3 + i * 0.08} className="flex items-start gap-3">
                     <div className="mt-0.5 text-primary">{icon}</div>
                     <div>
                       <div className="text-muted-foreground text-xs tracking-wide uppercase mb-0.5"
                         style={{ fontFamily: "'Liebling', 'DM Sans', sans-serif", fontWeight: 700 }}>{label}</div>
                       <div className="text-foreground font-light text-sm">{value}</div>
                     </div>
-                  </div>
+                  </Reveal>
                 ))}
               </div>
             </div>
 
-            <form
+            <Reveal
+              as="form"
+              y={28}
+              delay={0.15}
               className="lg:col-span-3 space-y-5"
               onSubmit={handleQuoteSubmit}
             >
@@ -841,7 +898,7 @@ export default function App() {
               )}
 
               <p className="text-muted-foreground text-xs text-center font-light">{t.formNote}</p>
-            </form>
+            </Reveal>
           </div>
         </div>
       </section>
