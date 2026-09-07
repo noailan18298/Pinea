@@ -10,6 +10,8 @@ import Reveal from "@/app/components/Reveal";
 import SplitHeading from "@/app/components/SplitHeading";
 import Preloader from "@/app/components/Preloader";
 import ClipReveal from "@/app/components/ClipReveal";
+import ClipReveal from "@/app/components/ClipReveal";
+import { onAppReady } from "@/app/lib/appReady";
 
 // ── Supabase enquiries endpoint ────────────────────────────────────────────
 
@@ -366,18 +368,15 @@ export default function App() {
       // and opens up to full-bleed during the very first scroll of the
       // page — as if the image is "painting in" before you move on to the
       // next section.
-            const heroWrap = heroWrapRef.current;
+         const heroWrap = heroWrapRef.current;
       if (heroWrap) {
         gsap.set(heroWrap, { clipPath: "inset(0% 0% 100% 0%)" });
-        gsap.to(heroWrap, {
-          clipPath: "inset(0% 0% 0% 0%)",
-          ease: "pineaOut",
-          scrollTrigger: {
-            trigger: heroWrap,
-            start: "top top",
-            end: "+=45%",
-            scrub: 0.3,
-          },
+        onAppReady(() => {
+          gsap.to(heroWrap, {
+            clipPath: "inset(0% 0% 0% 0%)",
+            duration: 1.4,
+            ease: "pineaOut",
+          });
         });
       }
     });
