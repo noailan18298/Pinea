@@ -73,7 +73,7 @@ export default function Preloader({ logoSrc, logoAlt, onDone }: PreloaderProps) 
         ref={logoRef}
         src={logoSrc}
         alt={logoAlt}
-        className="h-12 w-auto object-contain brightness-0 invert"
+        className="h-24 w-auto object-contain brightness-0 invert"
         style={{ opacity: 0 }}
       />
       <div
