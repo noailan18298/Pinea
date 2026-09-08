@@ -383,16 +383,20 @@ export default function App() {
         });
       }
 
-      const heroImg = heroImgRef.current;
-      if (heroImg) {
-        gsap.to(heroImg, {
+      [
+        { ref: heroImgRef, duration: 14 },
+        { ref: workshopImgRef, duration: 16 },
+      ].forEach(({ ref, duration }) => {
+        const el = ref.current;
+        if (!el) return;
+        gsap.to(el, {
           scale: 1.22,
-          duration: 14,
+          duration,
           ease: "sine.inOut",
           repeat: -1,
           yoyo: true,
         });
-      }
+      });
     });
     return () => ctx.revert();
   }, []);
