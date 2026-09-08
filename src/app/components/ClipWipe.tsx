@@ -43,8 +43,8 @@ export default function ClipWipe({ children, className = "", from = "bottom" }: 
         ease: "pineaOut",
         scrollTrigger: {
           trigger: el,
-          start: "top 90%",
-          end: "top 55%",
+          start: "top 100%",
+          end: "top 60%",
           scrub: 0.5,
         },
       });
