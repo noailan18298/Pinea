@@ -683,7 +683,7 @@ export default function App() {
                 onClick={() => setActiveCat(activeCat === cat.id ? null : cat.id)}
               >
                 <div className="relative overflow-hidden aspect-[4/3] bg-muted">
-                  <ClipWipe className="absolute inset-0" from={i % 2 === 0 ? "bottom" : "top"}>
+                  <ClipWipe className="absolute inset-0" from="bottom">
                     <LazyImage
                       src={cat.img}
                       alt={cat.alt}
