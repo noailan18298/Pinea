@@ -10,7 +10,10 @@ import Reveal from "@/app/components/Reveal";
 import SplitHeading from "@/app/components/SplitHeading";
 import Preloader from "@/app/components/Preloader";
 import ClipReveal from "@/app/components/ClipReveal";
-import ClipReveal from "@/app/components/ClipReveal";
+import CustomScrollbar from "@/app/components/CustomScrollbar";
+import ClipWipe from "@/app/components/ClipWipe";
+import LazyImage from "@/app/components/LazyImage";
+import HoverLink from "@/app/components/HoverLink";
 import { onAppReady } from "@/app/lib/appReady";
 
 // ── Supabase enquiries endpoint ────────────────────────────────────────────
@@ -364,11 +367,11 @@ export default function App() {
         );
       });
 
-      // The hero's signature moment: the frame is clipped in tight on load
-      // and opens up to full-bleed during the very first scroll of the
-      // page — as if the image is "painting in" before you move on to the
-      // next section.
-         const heroWrap = heroWrapRef.current;
+      // The hero's signature moment: the image "paints in" from top to
+      // bottom right after the preloader lifts — a one-time entrance, not
+      // tied to scroll, so the hero always looks complete even if the
+      // visitor never scrolls at all.
+      const heroWrap = heroWrapRef.current;
       if (heroWrap) {
         gsap.set(heroWrap, { clipPath: "inset(0% 0% 100% 0%)" });
         onAppReady(() => {
@@ -446,6 +449,7 @@ export default function App() {
       style={{ fontFamily: "'Liebling', 'DM Sans', sans-serif" }}
     >
       <Preloader logoSrc={isRtl ? pineaLogoHe : pineaLogo} logoAlt={t.logoAlt} />
+      <CustomScrollbar />
 
       {/* ── NAV ── */}
       <header
@@ -492,33 +496,88 @@ export default function App() {
             </button>
           </div>
 
-          <button className="md:hidden text-foreground/80 hover:text-foreground" onClick={() => setMenuOpen(!menuOpen)}>
-            {menuOpen ? <X size={22} /> : <Menu size={22} />}
+          <button
+            className="md:hidden relative w-9 h-9 flex items-center justify-center"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+          >
+            <span
+              className="absolute rounded-full transition-all ease-[cubic-bezier(0.642,0,0.328,1)]"
+              style={{
+                background: "var(--primary)",
+                width: menuOpen ? "300vmax" : 8,
+                height: menuOpen ? "300vmax" : 8,
+                transitionDuration: menuOpen ? "700ms" : "500ms",
+              }}
+            />
+            <span className="relative w-5 h-[1.5px] flex flex-col items-center justify-center gap-[5px]">
+              <span
+                className="block w-full h-full rounded-full transition-all duration-300"
+                style={{
+                  background: menuOpen ? "#0F0F0D" : "#F0EAE0",
+                  transform: menuOpen ? "rotate(45deg) translateY(3px)" : "none",
+                }}
+              />
+              <span
+                className="block w-full h-full rounded-full transition-all duration-300"
+                style={{
+                  background: menuOpen ? "#0F0F0D" : "#F0EAE0",
+                  transform: menuOpen ? "rotate(-45deg) translateY(-3px)" : "none",
+                }}
+              />
+            </span>
           </button>
         </div>
-
-        {menuOpen && (
-          <div className="md:hidden bg-card border-t border-border px-6 py-6 flex flex-col gap-5">
-            {t.nav.map(({ label, id }) => (
-              <button
-                key={id}
-                onClick={() => scrollTo(id)}
-                className="text-xl text-foreground/70 hover:text-foreground transition-colors"
-                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 600, textAlign: isRtl ? "right" : "left" }}
-              >
-                {label}
-              </button>
-            ))}
-            <button
-              onClick={() => { setLang(lang === "he" ? "en" : "he"); setMenuOpen(false); }}
-              className="self-start px-3 py-1.5 border border-foreground/20 text-foreground/50 text-xs tracking-widest"
-              style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 600 }}
-            >
-              {lang === "he" ? "EN" : "עב"}
-            </button>
-          </div>
-        )}
       </header>
+
+      {/* Full-screen overlay menu — rendered as a sibling of <header>, not a
+          child: <header> has an inline `transform` (for hide/show-on-scroll),
+          and any transform on an ancestor turns it into the containing
+          block for `position: fixed` descendants, which would otherwise
+          squash this overlay into the header's own small height instead of
+          the full viewport. The dot above grows to cover the entire
+          viewport, and the links fade/rise in once it's roughly full. */}
+      <div
+        className="md:hidden fixed inset-0 z-[55] flex flex-col items-center justify-center gap-8 transition-opacity duration-300"
+        style={{
+          opacity: menuOpen ? 1 : 0,
+          pointerEvents: menuOpen ? "auto" : "none",
+          transitionDelay: menuOpen ? "250ms" : "0ms",
+        }}
+      >
+        {t.nav.map(({ label, id }, i) => (
+          <button
+            key={id}
+            onClick={() => { scrollTo(id); setMenuOpen(false); }}
+            className="text-3xl transition-all duration-500"
+            style={{
+              fontFamily: "'Karantina', sans-serif",
+              fontWeight: 600,
+              color: "#0F0F0D",
+              opacity: menuOpen ? 1 : 0,
+              transform: menuOpen ? "translateY(0)" : "translateY(16px)",
+              transitionDelay: menuOpen ? `${350 + i * 60}ms` : "0ms",
+            }}
+          >
+            {label}
+          </button>
+        ))}
+        <button
+          onClick={() => { setLang(lang === "he" ? "en" : "he"); setMenuOpen(false); }}
+          className="mt-4 px-4 py-2 border text-sm tracking-widest transition-all duration-500"
+          style={{
+            fontFamily: "'Karantina', sans-serif",
+            fontWeight: 600,
+            borderColor: "rgba(15,15,13,0.3)",
+            color: "#0F0F0D",
+            opacity: menuOpen ? 1 : 0,
+            transform: menuOpen ? "translateY(0)" : "translateY(16px)",
+            transitionDelay: menuOpen ? `${350 + t.nav.length * 60}ms` : "0ms",
+          }}
+        >
+          {lang === "he" ? "EN" : "עב"}
+        </button>
+      </div>
 
       {/* ── HERO ── */}
       <section id="hero" className="relative min-h-screen flex flex-col justify-end pb-24 overflow-hidden pt-10">
@@ -562,13 +621,15 @@ export default function App() {
                 {t.heroBtn1}
                 <Arr size={16} className={`${arrHover} transition-transform`} />
               </button>
-              <button
+              <HoverLink
                 onClick={() => scrollTo("work")}
-                className="flex items-center gap-3 px-8 py-4 border border-foreground/25 text-foreground/65 hover:border-foreground/50 hover:text-foreground transition-all duration-200"
-                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 600, fontSize: "20px", letterSpacing: "0.08em" }}
+                dir={isRtl ? "rtl" : "ltr"}
+                className="text-foreground/70 hover:text-foreground transition-colors duration-300"
               >
-                {t.heroBtn2}
-              </button>
+                <span style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 600, fontSize: "20px", letterSpacing: "0.08em" }}>
+                  {t.heroBtn2}
+                </span>
+              </HoverLink>
             </Reveal>
           </div>
           <div className="mt-20 flex items-center gap-3 text-foreground/25">
@@ -626,11 +687,14 @@ export default function App() {
                 onClick={() => setActiveCat(activeCat === cat.id ? null : cat.id)}
               >
                 <div className="relative overflow-hidden aspect-[4/3] bg-muted">
-                  <img
-                    src={cat.img}
-                    alt={cat.alt}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
+                  <ClipWipe className="absolute inset-0" from={i % 2 === 0 ? "bottom" : "top"}>
+                    <LazyImage
+                      src={cat.img}
+                      alt={cat.alt}
+                      containerClassName="w-full h-full"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                  </ClipWipe>
                   <div
                     className="absolute inset-0"
                     style={{ background: "linear-gradient(to top, rgba(15,15,13,0.85) 0%, rgba(15,15,13,0.2) 60%, transparent 100%)" }}

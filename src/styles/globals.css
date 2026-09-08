@@ -1,0 +1,11 @@
+:root {
+  --pg: 0;
+}
+
+/* Custom scrollbar replaces the native one everywhere. */
+html {
+  scrollbar-width: none;
+}
+html::-webkit-scrollbar {
+  display: none;
+}

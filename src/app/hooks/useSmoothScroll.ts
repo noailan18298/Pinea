@@ -24,6 +24,20 @@ export function useSmoothScroll() {
 
     lenis.on("scroll", ScrollTrigger.update);
 
+    // Publish a single, global scroll-progress value (0 → 1 across the
+    // whole document) as a CSS custom property. Any element, anywhere in
+    // the stylesheet, can read var(--pg) — this is what the custom
+    // scrollbar reads, and what future effects (hover links, mosaics,
+    // per-section progress bars) can hook into without each needing their
+    // own scroll listener.
+    const updatePg = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const pg = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+      document.documentElement.style.setProperty("--pg", pg.toFixed(4));
+    };
+    lenis.on("scroll", updatePg);
+    updatePg();
+
     const tick = (time: number) => {
       lenis.raf(time * 1000);
     };
