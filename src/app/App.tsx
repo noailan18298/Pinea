@@ -582,10 +582,11 @@ export default function App() {
       {/* ── HERO ── */}
       <section id="hero" className="relative min-h-screen flex flex-col justify-end pb-24 overflow-hidden pt-10">
         <div ref={heroWrapRef} className="absolute inset-0 overflow-hidden" style={{ willChange: "clip-path" }}>
-          <img
+          <LazyImage
             ref={heroImgRef}
             src="https://images.unsplash.com/photo-1547609434-b732edfee020?w=1800&h=1100&fit=crop&auto=format"
             alt={t.logoAlt}
+            containerClassName="w-full h-full"
             className="w-full h-full object-cover scale-110"
           />
           <div className="absolute inset-0" style={{ background: "linear-gradient(to top, #0F0F0D 0%, rgba(15,15,13,0.6) 50%, rgba(15,15,13,0.25) 100%)" }} />
