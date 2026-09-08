@@ -382,6 +382,17 @@ export default function App() {
           });
         });
       }
+
+      const heroImg = heroImgRef.current;
+      if (heroImg) {
+        gsap.to(heroImg, {
+          scale: 1.22,
+          duration: 14,
+          ease: "sine.inOut",
+          repeat: -1,
+          yoyo: true,
+        });
+      }
     });
     return () => ctx.revert();
   }, []);
