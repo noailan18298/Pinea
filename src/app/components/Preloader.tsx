@@ -66,7 +66,7 @@ export default function Preloader({ logoSrc, logoAlt, onDone }: PreloaderProps) 
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-6"
+      className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-8"
       style={{ background: "#0F0F0D" }}
     >
       <img
@@ -78,7 +78,7 @@ export default function Preloader({ logoSrc, logoAlt, onDone }: PreloaderProps) 
       />
       <div
         ref={barTrackRef}
-        className="w-40 h-px overflow-hidden"
+        className="w-64 h-px overflow-hidden"
         style={{ background: "rgba(240,234,224,0.15)" }}
       >
         <div
