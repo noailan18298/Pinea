@@ -632,10 +632,6 @@ export default function App() {
               </HoverLink>
             </Reveal>
           </div>
-          <div className="mt-20 flex items-center gap-3 text-foreground/25">
-            <div className="w-8 h-px bg-foreground/25" />
-            <ChevronDown size={14} className="animate-bounce" />
-          </div>
         </div>
       </section>
 
