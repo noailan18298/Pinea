@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Save, LogOut, Globe, ChevronDown, ChevronUp, Check } from "lucide-react";
-import { fetchContent, saveContent, verifyPassword } from "./api";
+import { Save, LogOut, Globe, ChevronDown, ChevronUp, Check, Upload, Loader2 } from "lucide-react";
+import { fetchContent, saveContent, verifyPassword, uploadImage } from "./api";
 
 type Lang = "he" | "en";
 
@@ -83,6 +83,80 @@ function Field({ label, value, onChange, multiline }: { label: string; value: st
   );
 }
 
+/** A drag-and-drop (or click-to-browse) image field. Shows the current
+ * image as a thumbnail, uploads whatever is dropped/picked to Storage via
+ * the server, and reports the resulting public URL back via onChange —
+ * exactly like a text Field, just for images. */
+function ImageField({ label, value, onChange }: { label: string; value: string; onChange: (url: string) => void }) {
+  const [dragging, setDragging] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const inputId = `image-field-${label.replace(/\s+/g, "-").toLowerCase()}`;
+
+  const handleFile = async (file: File | undefined) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setError("Please choose an image file.");
+      return;
+    }
+    setError(null);
+    setUploading(true);
+    try {
+      const url = await uploadImage(file);
+      onChange(url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <div>
+      <label className="block text-xs text-muted-foreground uppercase tracking-wide mb-1">{label}</label>
+      <div
+        onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragging(false);
+          handleFile(e.dataTransfer.files?.[0]);
+        }}
+        className={`relative flex items-center gap-4 border rounded-sm p-3 transition-colors ${
+          dragging ? "border-primary bg-primary/5" : "border-border bg-secondary"
+        }`}
+      >
+        <div className="w-24 h-16 shrink-0 rounded-sm overflow-hidden bg-muted border border-border">
+          {value ? (
+            <img src={value} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-muted-foreground text-[10px]">
+              No image
+            </div>
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <label
+            htmlFor={inputId}
+            className="inline-flex items-center gap-2 px-3 py-1.5 bg-card border border-border rounded-sm text-xs cursor-pointer hover:border-primary transition-colors"
+          >
+            {uploading ? <Loader2 size={13} className="animate-spin" /> : <Upload size={13} />}
+            {uploading ? "Uploading..." : "Drop an image or click to choose"}
+          </label>
+          <input
+            id={inputId}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => handleFile(e.target.files?.[0])}
+          />
+          {error && <p className="text-destructive text-[11px] mt-1">{error}</p>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Admin({ defaults, onSaved }: Props) {
   const [authed, setAuthed] = useState(false);
   const [password, setPassword] = useState("");
@@ -119,6 +193,18 @@ export default function Admin({ defaults, onSaved }: Props) {
 
   const update = (key: string, value: any) => {
     setContent((c) => ({ ...c, [lang]: { ...c[lang], [key]: value } }));
+    setSaved(false);
+  };
+
+  // Images aren't really language-specific — writing to both languages at
+  // once means uploading a new photo doesn't leave the other language
+  // showing a stale one until someone remembers to switch tabs and upload
+  // it again there too.
+  const updateImage = (key: string, value: any) => {
+    setContent((c) => ({
+      he: { ...(c.he ?? defaults.he), [key]: value },
+      en: { ...(c.en ?? defaults.en), [key]: value },
+    }));
     setSaved(false);
   };
 
@@ -225,6 +311,13 @@ export default function Admin({ defaults, onSaved }: Props) {
           Editing: <strong className="text-foreground">{lang === "he" ? "Hebrew" : "English"}</strong> content.
           Changes affect both languages when you click Save All.
         </p>
+
+        {/* Images */}
+        <Section title="Images" defaultOpen>
+          <ImageField label="Hero Background" value={current.heroImage ?? ""} onChange={(v) => updateImage("heroImage", v)} />
+          <ImageField label="Workshop Interlude" value={current.workshopImage ?? ""} onChange={(v) => updateImage("workshopImage", v)} />
+          <ImageField label="About Section" value={current.aboutImage ?? ""} onChange={(v) => updateImage("aboutImage", v)} />
+        </Section>
 
         {/* General Text */}
         <Section title="General Text" defaultOpen>
