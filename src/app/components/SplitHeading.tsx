@@ -2,14 +2,26 @@ import { useEffect, useLayoutEffect, useRef, type ReactNode, type ElementType, t
 import { gsap, SplitText } from "@/app/lib/gsap";
 import { onAppReady } from "@/app/lib/appReady";
 
+/** Flattens a ReactNode tree down to its plain text, so we can tell whether
+ * the actual displayed words changed (e.g. a language toggle) as opposed to
+ * an unrelated parent re-render that recreates the same JSX with identical
+ * text — the latter must NOT re-trigger the split/reveal, or every scroll
+ * or menu toggle would make headings flicker and re-animate. */
+function textKeyOf(node: ReactNode): string {
+  if (node === null || node === undefined || typeof node === "boolean") return "";
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(textKeyOf).join("|");
+  if (typeof node === "object" && "props" in (node as any)) {
+    return textKeyOf((node as any).props?.children);
+  }
+  return "";
+}
+
 type SplitHeadingProps = {
   children: ReactNode;
   className?: string;
   style?: CSSProperties;
   as?: ElementType;
-  /** "chars" (default) mimics the reference site: characters fade in, in random
-   * order, no movement or scale — just a subtle shimmer. "lines"/"words" fall
-   * back to a gentler grow+fade, useful for very long paragraphs. */
   type?: "chars" | "lines" | "words";
   stagger?: number;
   delay?: number;
@@ -27,10 +39,8 @@ export default function SplitHeading({
   const ref = useRef<HTMLHeadingElement>(null);
   const splitRef = useRef<SplitText | null>(null);
   const targetsRef = useRef<Element[]>([]);
+  const textKey = textKeyOf(children);
 
-  // Split the text and hide the pieces BEFORE the browser paints anything —
-  // otherwise the heading sits fully visible under the preloader curtain,
-  // and the "reveal" animation ends up flickering instead of fading in.
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -64,7 +74,7 @@ export default function SplitHeading({
       targetsRef.current = [];
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [type]);
+  }, [type, textKey]);
 
   useEffect(() => {
     const el = ref.current;
@@ -83,10 +93,6 @@ export default function SplitHeading({
       const el = ref.current;
       const targets = targetsRef.current;
 
-      // Same rule as Reveal: headings already on screen at load (e.g. the
-      // Hero) get a one-time, gently-timed entrance. Everything else is
-      // tied directly to scroll position in both directions, so scrolling
-      // up even a little immediately starts reversing it.
       const alreadyInView = el.getBoundingClientRect().top < window.innerHeight * 0.88;
 
       ctx = gsap.context(() => {
@@ -153,7 +159,7 @@ export default function SplitHeading({
       ctx?.revert();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [type, stagger, delay]);
+  }, [type, stagger, delay, textKey]);
 
   return (
     <Tag ref={ref} className={className} style={style}>
