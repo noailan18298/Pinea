@@ -470,7 +470,7 @@ export default function App() {
 
       {/* ── NAV ── */}
       <header
-        className="fixed top-0 inset-x-0 z-50 transition-all duration-300"
+        className="fixed top-0 inset-x-0 z-[60] transition-all duration-300"
         style={{
           background: scrolled ? "rgba(15,15,13,0.92)" : "transparent",
           backdropFilter: scrolled ? "blur(12px)" : "none",
@@ -489,7 +489,7 @@ export default function App() {
                 key={id}
                 onClick={() => scrollTo(id)}
                 className="tracking-wide text-foreground/60 hover:text-foreground transition-colors duration-200 text-[20px]"
-                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 500 }}
+                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 400 }}
               >
                 {label}
               </button>
@@ -507,7 +507,7 @@ export default function App() {
             <button
               onClick={() => { setLang(lang === "he" ? "en" : "he"); setActiveCat(null); }}
               className="px-3 py-1.5 border border-foreground/20 text-foreground/50 hover:border-primary hover:text-primary transition-all duration-200 tracking-widest"
-              style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 600, fontSize: "20px" }}
+              style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 700, fontSize: "20px" }}
             >
               {lang === "he" ? "EN" : "עב"}
             </button>
@@ -527,7 +527,7 @@ export default function App() {
                 transitionDuration: menuOpen ? "700ms" : "500ms",
               }}
             />
-            <span className="relative w-5 h-[1.5px] flex flex-col items-center justify-center gap-[5px]">
+            <span className="relative z-10 w-6 h-[2px] flex flex-col items-center justify-center gap-[6px]">
               <span
                 className="block w-full h-full rounded-full transition-all duration-300"
                 style={{
@@ -613,7 +613,7 @@ export default function App() {
           <div className="max-w-3xl">
             <Reveal as="p"
               className="text-primary tracking-wide uppercase text-[36px] m-[0px]"
-              style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 500 }}
+              style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 400 }}
             >
               {t.heroBadge}
             </Reveal>
@@ -645,7 +645,7 @@ export default function App() {
                 dir={isRtl ? "rtl" : "ltr"}
                 className="text-foreground/70 hover:text-foreground transition-colors duration-300"
               >
-                <span style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 600, fontSize: "20px", letterSpacing: "0.08em" }}>
+                <span style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 700, fontSize: "20px", letterSpacing: "0.08em" }}>
                   {t.heroBtn2}
                 </span>
               </HoverLink>
@@ -658,12 +658,12 @@ export default function App() {
       <section className="border-y border-border bg-secondary py-10">
         <div className="max-w-7xl mx-auto px-6">
           <SplitHeading
-            key={lang}
+              key={lang}
             as="p"
             type="words"
             stagger={0.03}
             className="text-center text-foreground/50 tracking-wide"
-            style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 500, fontSize: "28px" }}
+            style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 400, fontSize: "28px" }}
           >
             {t.strip}
           </SplitHeading>
@@ -677,15 +677,15 @@ export default function App() {
             <div>
               <Reveal as="p"
                 className="text-primary tracking-wide uppercase mb-3 text-[20px]"
-                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 500 }}
+                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 400 }}
               >
                 {t.workLabel}
               </Reveal>
               <SplitHeading
-                key={lang}
+              key={lang}
                 as="h2"
                 className="text-foreground leading-none"
-                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 800, fontSize: "clamp(1.8rem, 3.5vw, 3rem)" }}
+                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 700, fontSize: "clamp(1.8rem, 3.5vw, 3rem)" }}
               >
                 {t.workTitle}
               </SplitHeading>
@@ -776,15 +776,15 @@ export default function App() {
             <div className="max-w-lg">
               <Reveal as="p"
                 className="text-primary tracking-wide uppercase text-[20px] m-[0px]"
-                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 500 }}
+                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 400 }}
               >
                 {t.workshopLabel}
               </Reveal>
               <SplitHeading
-                key={lang}
+              key={lang}
                 as="h2"
                 className="text-foreground mb-6"
-                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 800, fontSize: "48px", lineHeight: 1.05 }}
+                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 700, fontSize: "48px", lineHeight: 1.05 }}
               >
                 {t.workshopH2[0]}<br />{t.workshopH2[1]}<br />{t.workshopH2[2]}
               </SplitHeading>
@@ -809,7 +809,7 @@ export default function App() {
           <div className="mb-16">
             <Reveal as="p"
               className="text-primary tracking-wide uppercase mb-0"
-              style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 500, fontSize: "20px" }}
+              style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 400, fontSize: "20px" }}
             >
               {t.processLabel}
             </Reveal>
@@ -817,7 +817,7 @@ export default function App() {
               key={lang}
               as="h2"
               className="text-foreground"
-              style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 800, fontSize: "clamp(1.8rem, 3.5vw, 3rem)" }}
+              style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 700, fontSize: "clamp(1.8rem, 3.5vw, 3rem)" }}
             >
               {t.processTitle}
             </SplitHeading>
@@ -828,7 +828,7 @@ export default function App() {
               <Reveal key={step.num} delay={i * 0.12} className="bg-secondary p-10">
                 <div
                   className="text-primary mb-8"
-                  style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 800, fontSize: "4rem", lineHeight: 1 }}
+                  style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 700, fontSize: "4rem", lineHeight: 1 }}
                 >
                   {step.num}
                 </div>
@@ -861,7 +861,7 @@ export default function App() {
             <div>
               <Reveal as="p"
                 className="text-primary tracking-wide uppercase mb-4"
-                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 500, fontSize: "20px" }}
+                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 400, fontSize: "20px" }}
               >
                 {t.aboutLabel}
               </Reveal>
@@ -869,7 +869,7 @@ export default function App() {
               key={lang}
                 as="h2"
                 className="text-foreground mb-8 leading-none"
-                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 800, fontSize: "clamp(1.75rem, 3vw, 2.75rem)" }}
+                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 700, fontSize: "clamp(1.75rem, 3vw, 2.75rem)" }}
               >
                 {t.aboutTitle[0]}<br />{t.aboutTitle[1]}
               </SplitHeading>
@@ -903,7 +903,7 @@ export default function App() {
             <div className="lg:col-span-2">
               <Reveal as="p"
                 className="text-primary tracking-wide uppercase mb-4"
-                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 500, fontSize: "20px" }}
+                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 400, fontSize: "20px" }}
               >
                 {t.quoteLabel}
               </Reveal>
@@ -911,7 +911,7 @@ export default function App() {
               key={lang}
                 as="h2"
                 className="text-foreground mb-6 leading-none"
-                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 800, fontSize: "clamp(1.8rem, 3vw, 2.8rem)" }}
+                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 700, fontSize: "clamp(1.8rem, 3vw, 2.8rem)" }}
               >
                 {t.quoteTitle[0]}<br />{t.quoteTitle[1]}<br />{t.quoteTitle[2]}
               </SplitHeading>
@@ -1031,7 +1031,7 @@ export default function App() {
             {t.nav.map(({ label, id }) => (
               <button key={id} onClick={() => scrollTo(id)}
                 className="text-muted-foreground hover:text-foreground text-xs tracking-wide transition-colors"
-                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 500, fontSize: "16px"  }}>
+                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 400, fontSize: "16px"  }}>
                 {label}
               </button>
             ))}
