@@ -328,7 +328,7 @@ export default function App() {
   const t = { ...TRANSLATIONS[lang], ...(overrides[lang] ?? {}) };
   const isRtl = lang === "he";
 
-  useSmoothScroll();
+  useSmoothScroll(!isAdmin);
 
   useEffect(() => {
     let lastY = window.scrollY;
