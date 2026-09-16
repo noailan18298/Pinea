@@ -470,7 +470,7 @@ export default function App() {
 
       {/* ── NAV ── */}
       <header
-        className="fixed top-0 inset-x-0 z-[60] transition-all duration-300"
+        className="fixed top-0 inset-x-0 z-50 transition-all duration-300"
         style={{
           background: scrolled ? "rgba(15,15,13,0.92)" : "transparent",
           backdropFilter: scrolled ? "blur(12px)" : "none",
@@ -512,54 +512,63 @@ export default function App() {
               {lang === "he" ? "EN" : "עב"}
             </button>
           </div>
-
-          <button
-            className="md:hidden relative w-9 h-9 flex items-center justify-center"
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
-          >
-            <span
-              className="absolute rounded-full transition-all ease-[cubic-bezier(0.642,0,0.328,1)]"
-              style={{
-                background: "var(--primary)",
-                width: menuOpen ? "300vmax" : 8,
-                height: menuOpen ? "300vmax" : 8,
-                transitionDuration: menuOpen ? "700ms" : "500ms",
-              }}
-            />
-            <span className="relative z-10 w-6 h-[2px] flex flex-col items-center justify-center gap-[6px]">
-              <span
-                className="block w-full h-full rounded-full transition-all duration-300"
-                style={{
-                  background: menuOpen ? "#0F0F0D" : "#F0EAE0",
-                  transform: menuOpen ? "rotate(45deg) translateY(3px)" : "none",
-                }}
-              />
-              <span
-                className="block w-full h-full rounded-full transition-all duration-300"
-                style={{
-                  background: menuOpen ? "#0F0F0D" : "#F0EAE0",
-                  transform: menuOpen ? "rotate(-45deg) translateY(-3px)" : "none",
-                }}
-              />
-            </span>
-          </button>
         </div>
       </header>
 
-      {/* Full-screen overlay menu — rendered as a sibling of <header>, not a
-          child: <header> has an inline `transform` (for hide/show-on-scroll),
-          and any transform on an ancestor turns it into the containing
-          block for `position: fixed` descendants, which would otherwise
-          squash this overlay into the header's own small height instead of
-          the full viewport. The dot above grows to cover the entire
-          viewport, and the links fade/rise in once it's roughly full. */}
+      {/* The mobile menu toggle: just the small dot/X icon, nothing else.
+          It no longer carries its own giant background circle — see the
+          note on the overlay below for why. */}
+      <button
+        className="md:hidden fixed top-3.5 z-[70] w-9 h-9 flex items-center justify-center"
+        style={isRtl ? { left: "1.5rem" } : { right: "1.5rem" }}
+        onClick={() => setMenuOpen(!menuOpen)}
+        aria-label={menuOpen ? "Close menu" : "Open menu"}
+      >
+        <span
+          className="absolute rounded-full transition-all duration-500 ease-[cubic-bezier(0.642,0,0.328,1)]"
+          style={{
+            background: menuOpen ? "transparent" : "var(--primary)",
+            border: menuOpen ? "1.5px solid #F0EAE0" : "none",
+            width: menuOpen ? 28 : 8,
+            height: menuOpen ? 28 : 8,
+          }}
+        />
+        <span className="relative w-6 h-[2px] flex flex-col items-center justify-center gap-[6px]">
+          <span
+            className="block w-full h-full rounded-full transition-all duration-300"
+            style={{
+              background: "#F0EAE0",
+              transform: menuOpen ? "rotate(45deg) translateY(3px)" : "none",
+            }}
+          />
+          <span
+            className="block w-full h-full rounded-full transition-all duration-300"
+            style={{
+              background: "#F0EAE0",
+              transform: menuOpen ? "rotate(-45deg) translateY(-3px)" : "none",
+            }}
+          />
+        </span>
+      </button>
+
+      {/* Full-screen overlay menu — this element itself IS the "growing
+          circle": its own background is the primary color, and it reveals
+          via clip-path from a tiny circle at the toggle button's corner
+          out to fill the viewport. Earlier this used a *separate* decoy
+          circle living inside the toggle button, floating above this
+          overlay in z-index — which meant that decoy (being on top) hid
+          this overlay's own nav links behind a solid, un-clickable orange
+          disc. Making the overlay do its own reveal removes the second
+          competing element entirely, so there's nothing left to fight
+          the nav links for top billing. */}
       <div
-        className="md:hidden fixed inset-0 z-[55] flex flex-col items-center justify-center gap-8 transition-opacity duration-300"
+        className="md:hidden fixed inset-0 z-[65] flex flex-col items-center justify-center gap-8 transition-[clip-path] duration-700 ease-[cubic-bezier(0.642,0,0.328,1)]"
         style={{
-          opacity: menuOpen ? 1 : 0,
+          background: "var(--primary)",
+          clipPath: menuOpen
+            ? "circle(150% at calc(100% - 2.25rem) 2rem)"
+            : "circle(0% at calc(100% - 2.25rem) 2rem)",
           pointerEvents: menuOpen ? "auto" : "none",
-          transitionDelay: menuOpen ? "250ms" : "0ms",
         }}
       >
         {t.nav.map(({ label, id }, i) => (
@@ -569,7 +578,7 @@ export default function App() {
             className="text-3xl transition-all duration-500"
             style={{
               fontFamily: "'Karantina', sans-serif",
-              fontWeight: 600,
+              fontWeight: 700,
               color: "#0F0F0D",
               opacity: menuOpen ? 1 : 0,
               transform: menuOpen ? "translateY(0)" : "translateY(16px)",
@@ -584,7 +593,7 @@ export default function App() {
           className="mt-4 px-4 py-2 border text-sm tracking-widest transition-all duration-500"
           style={{
             fontFamily: "'Karantina', sans-serif",
-            fontWeight: 600,
+            fontWeight: 700,
             borderColor: "rgba(15,15,13,0.3)",
             color: "#0F0F0D",
             opacity: menuOpen ? 1 : 0,
