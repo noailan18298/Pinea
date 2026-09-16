@@ -54,6 +54,9 @@ async function submitEnquiry(payload: {
 const TRANSLATIONS = {
   he: {
     dir: "rtl" as const,
+    heroImage: "https://images.unsplash.com/photo-1547609434-b732edfee020?w=1800&h=1100&fit=crop&auto=format",
+    workshopImage: "https://images.unsplash.com/photo-1506599667882-385dd6673353?w=1800&h=700&fit=crop&auto=format",
+    aboutImage: "https://images.unsplash.com/photo-1631396326646-c06a935ff3a6?w=900&h=1200&fit=crop&auto=format",
     nav: [
       { label: "העבודות שלנו", id: "work" },
       { label: "תהליך", id: "process" },
@@ -179,6 +182,9 @@ const TRANSLATIONS = {
   },
   en: {
     dir: "ltr" as const,
+    heroImage: "https://images.unsplash.com/photo-1547609434-b732edfee020?w=1800&h=1100&fit=crop&auto=format",
+    workshopImage: "https://images.unsplash.com/photo-1506599667882-385dd6673353?w=1800&h=700&fit=crop&auto=format",
+    aboutImage: "https://images.unsplash.com/photo-1631396326646-c06a935ff3a6?w=900&h=1200&fit=crop&auto=format",
     nav: [
       { label: "Our Work", id: "work" },
       { label: "Process", id: "process" },
@@ -383,20 +389,16 @@ export default function App() {
         });
       }
 
-      [
-        { ref: heroImgRef, duration: 14 },
-        { ref: workshopImgRef, duration: 16 },
-      ].forEach(({ ref, duration }) => {
-        const el = ref.current;
-        if (!el) return;
-        gsap.to(el, {
+      const heroImg = heroImgRef.current;
+      if (heroImg) {
+        gsap.to(heroImg, {
           scale: 1.22,
-          duration,
+          duration: 14,
           ease: "sine.inOut",
           repeat: -1,
           yoyo: true,
         });
-      });
+      }
     });
     return () => ctx.revert();
   }, []);
@@ -599,7 +601,7 @@ export default function App() {
         <div ref={heroWrapRef} className="absolute inset-0 overflow-hidden" style={{ willChange: "clip-path" }}>
           <LazyImage
             ref={heroImgRef}
-            src="https://images.unsplash.com/photo-1547609434-b732edfee020?w=1800&h=1100&fit=crop&auto=format"
+            src={t.heroImage}
             alt={t.logoAlt}
             containerClassName="w-full h-full"
             className="w-full h-full object-cover scale-110"
@@ -761,7 +763,7 @@ export default function App() {
       <section className="relative h-72 md:h-[28rem] overflow-hidden">
         <img
           ref={workshopImgRef}
-          src="https://images.unsplash.com/photo-1506599667882-385dd6673353?w=1800&h=700&fit=crop&auto=format"
+          src={t.workshopImage}
           alt="Welding steel in the Pinea Studio workshop"
           className="w-full h-full object-cover object-center scale-110"
         />
@@ -845,7 +847,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <ClipReveal
-              src="https://images.unsplash.com/photo-1631396326646-c06a935ff3a6?w=900&h=1200&fit=crop&auto=format"
+              src={t.aboutImage}
               alt="Oren working in the Pinea Studio workshop"
               className="relative aspect-[3/4] bg-muted"
             />
