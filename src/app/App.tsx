@@ -658,6 +658,7 @@ export default function App() {
       <section className="border-y border-border bg-secondary py-10">
         <div className="max-w-7xl mx-auto px-6">
           <SplitHeading
+            key={lang}
             as="p"
             type="words"
             stagger={0.03}
