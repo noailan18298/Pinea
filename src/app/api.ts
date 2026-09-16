@@ -32,3 +32,25 @@ export async function verifyPassword(password: string): Promise<boolean> {
     return false;
   }
 }
+
+/** Reads a File as a base64 data URL and uploads it, returning the public
+ * URL of the stored image (or throwing on failure). */
+export async function uploadImage(file: File): Promise<string> {
+  const dataUrl = await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+
+  const res = await fetch(`${BASE}/upload-image`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ filename: file.name, dataUrl }),
+  });
+  const data = await res.json();
+  if (!res.ok || !data.url) {
+    throw new Error(data.error ?? "Upload failed");
+  }
+  return data.url as string;
+}
