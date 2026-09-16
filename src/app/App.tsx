@@ -618,6 +618,7 @@ export default function App() {
               {t.heroBadge}
             </Reveal>
             <SplitHeading
+              key={lang}
               as="h1"
               className="text-foreground leading-none mb-6"
               style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 700, fontSize: "clamp(5rem, 10vw, 7rem)", letterSpacing: "0" }}
@@ -680,6 +681,7 @@ export default function App() {
                 {t.workLabel}
               </Reveal>
               <SplitHeading
+                key={lang}
                 as="h2"
                 className="text-foreground leading-none"
                 style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 800, fontSize: "clamp(1.8rem, 3.5vw, 3rem)" }}
@@ -778,6 +780,7 @@ export default function App() {
                 {t.workshopLabel}
               </Reveal>
               <SplitHeading
+                key={lang}
                 as="h2"
                 className="text-foreground mb-6"
                 style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 800, fontSize: "48px", lineHeight: 1.05 }}
@@ -810,6 +813,7 @@ export default function App() {
               {t.processLabel}
             </Reveal>
             <SplitHeading
+              key={lang}
               as="h2"
               className="text-foreground"
               style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 800, fontSize: "clamp(1.8rem, 3.5vw, 3rem)" }}
@@ -861,6 +865,7 @@ export default function App() {
                 {t.aboutLabel}
               </Reveal>
               <SplitHeading
+              key={lang}
                 as="h2"
                 className="text-foreground mb-8 leading-none"
                 style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 800, fontSize: "clamp(1.75rem, 3vw, 2.75rem)" }}
@@ -902,6 +907,7 @@ export default function App() {
                 {t.quoteLabel}
               </Reveal>
               <SplitHeading
+              key={lang}
                 as="h2"
                 className="text-foreground mb-6 leading-none"
                 style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 800, fontSize: "clamp(1.8rem, 3vw, 2.8rem)" }}
