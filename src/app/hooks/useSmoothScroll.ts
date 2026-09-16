@@ -8,8 +8,10 @@ declare global {
   }
 }
 
-export function useSmoothScroll() {
+export function useSmoothScroll(enabled = true) {
   useEffect(() => {
+    if (!enabled) return;
+
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
@@ -51,7 +53,7 @@ export function useSmoothScroll() {
       lenis.destroy();
       window.__lenis = undefined;
     };
-  }, []);
+  }, [enabled]);
 }
 
 export function smoothScrollToId(id: string, offset = -64) {
