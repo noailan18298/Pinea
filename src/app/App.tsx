@@ -533,22 +533,7 @@ export default function App() {
             height: menuOpen ? 28 : 8,
           }}
         />
-        <span className="relative w-6 h-[2px] flex flex-col items-center justify-center gap-[6px]">
-          <span
-            className="block w-full h-full rounded-full transition-all duration-300"
-            style={{
-              background: "#F0EAE0",
-              transform: menuOpen ? "rotate(45deg) translateY(3px)" : "none",
-            }}
-          />
-          <span
-            className="block w-full h-full rounded-full transition-all duration-300"
-            style={{
-              background: "#F0EAE0",
-              transform: menuOpen ? "rotate(-45deg) translateY(-3px)" : "none",
-            }}
-          />
-        </span>
+          {menuOpen && <X size={16} color="#F0EAE0" strokeWidth={2} className="relative" />}
       </button>
 
       {/* Full-screen overlay menu — this element itself IS the "growing
