@@ -615,7 +615,7 @@ export default function App() {
               key={lang}
               as="h1"
               className="text-foreground leading-none mb-6"
-              style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 700, fontSize: "clamp(5rem, 10vw, 7rem)", letterSpacing: "0" }}
+              style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 700, fontSize: "clamp(2.5rem, 9vw, 7rem)", letterSpacing: "0" }}
               delay={0.15}
             >
               {t.heroH1[0]}<br />
