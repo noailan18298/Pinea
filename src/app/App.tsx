@@ -614,6 +614,7 @@ export default function App() {
             <SplitHeading
               key={lang}
               as="h1"
+              type="chars"
               className="text-foreground leading-none mb-6"
               style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 700, fontSize: "clamp(4rem, 16vw, 7rem)", letterSpacing: "0" }}
               delay={0.15}
