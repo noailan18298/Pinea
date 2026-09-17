@@ -772,15 +772,15 @@ export default function App() {
       </section>
 
       {/* ── WORKSHOP INTERLUDE ── */}
-      <section className="relative h-72 md:h-[28rem] overflow-hidden">
+      <section className="relative py-16 md:py-0 md:h-[28rem] overflow-hidden">
         <img
           ref={workshopImgRef}
           src={t.workshopImage}
           alt="Welding steel in the Pinea Studio workshop"
-          className="w-full h-full object-cover object-center scale-110"
+          className="absolute inset-0 w-full h-full object-cover object-center scale-110"
         />
         <div className="absolute inset-0" style={{ background: isRtl ? "linear-gradient(to left, rgba(15,15,13,0.88) 0%, rgba(15,15,13,0.25) 100%)" : "linear-gradient(to right, rgba(15,15,13,0.88) 0%, rgba(15,15,13,0.25) 100%)" }} />
-        <div className="absolute inset-0 flex items-center">
+        <div className="relative md:absolute md:inset-0 flex items-center">
           <div className="max-w-7xl mx-auto px-6 w-full flex justify-start">
             <div className="max-w-lg">
               <Reveal as="p"
@@ -792,8 +792,8 @@ export default function App() {
               <SplitHeading
               key={lang}
                 as="h2"
-                className="text-foreground mb-6"
-                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 700, fontSize: "48px", lineHeight: 1.05 }}
+                className="text-foreground mb-6 text-[30px] md:text-[48px]"
+                style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 700, lineHeight: 1.05 }}
               >
                 {t.workshopH2[0]}<br />{t.workshopH2[1]}<br />{t.workshopH2[2]}
               </SplitHeading>
