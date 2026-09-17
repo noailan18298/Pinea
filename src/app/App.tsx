@@ -603,7 +603,7 @@ export default function App() {
           <div className="absolute inset-0" style={{ background: "linear-gradient(to top, #0F0F0D 0%, rgba(15,15,13,0.6) 50%, rgba(15,15,13,0.25) 100%)" }} />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-6 w-full mt-[80px]">
+        <div className="relative max-w-7xl mx-auto px-4 md:px-6 w-full mt-[80px]">
           <div className="max-w-3xl">
             <Reveal as="p"
               className="text-primary tracking-wide uppercase text-[36px] m-[0px]"
@@ -615,7 +615,7 @@ export default function App() {
               key={lang}
               as="h1"
               className="text-foreground leading-none mb-6"
-              style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 700, fontSize: "clamp(2.5rem, 9vw, 7rem)", letterSpacing: "0" }}
+              style={{ fontFamily: "'Karantina', sans-serif", fontWeight: 700, fontSize: "clamp(3rem, 12vw, 7rem)", letterSpacing: "0" }}
               delay={0.15}
             >
               {t.heroH1[0]}<br />
